@@ -55,7 +55,6 @@ void AZooSmashCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 	PlayerInputComponent->BindTouch(IE_Released, this, &AZooSmashCharacter::TouchStopped);
 }
 
-
 void AZooSmashCharacter::OnResetVR()
 {
 	// If ZooSmash is added to a project via 'Add Feature' in the Unreal Editor the dependency on HeadMountedDisplay in ZooSmash.Build.cs is not automatically propagated
