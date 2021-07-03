@@ -1,5 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "CrowdAiController_tourism.h"
+
 #include "ZooSmash.h"
 #include "ZooSmash/ZooSmashCharacter.h"
 #include "Runtime/Engine/Classes/GameFramework/CharacterMovementComponent.h"
@@ -29,8 +31,6 @@
 #include "GeneratedCodeHelpers.h"
 
 #include "AIController.h"
-#include "CrowdAiController_tourism.h"
-
 
 void ACrowdAiController_tourism::SecondPhase()
 {
@@ -64,8 +64,7 @@ void ACrowdAiController_tourism::SecondPhase()
 	NewDir = UKismetMathLibrary::Normal(NewDir, 0.000100);
 	MoveVector = UKismetMathLibrary::Multiply_VectorFloat(NewDir, 2 * SearchRadius);
 	MoveVector = UKismetMathLibrary::Add_VectorVector(AiLocation, MoveVector);
-	// hasPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, MoveVector, dest, 1.000000, ((ANavigationData*)nullptr), ((UClass*)nullptr));
-	dest = FVector(0, 0, 0);
+	hasPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, MoveVector, dest, 1.000000, ((ANavigationData*)nullptr), ((UClass*)nullptr));
 
 	Super::WalkTo(dest);
 }
@@ -82,8 +81,7 @@ void ACrowdAiController_tourism::SecondPhaseFail(EPathFollowingResult::Type move
 	{
 		aiLocotion = aiPawn->AActor::K2_GetActorLocation();
 	}
-	//hasRandomPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, aiLocotion, randomPoint, 100.0, ((ANavigationData*)nullptr), ((UClass*)nullptr));
-	randomPoint = FVector(0, 0, 0);
+	hasRandomPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, aiLocotion, randomPoint, 100.0, ((ANavigationData*)nullptr), ((UClass*)nullptr));
 
 	reverseDir = randomPoint * -1;
 	Super::WalkTo(reverseDir, 5.0f, FName(TEXT("SecondPhase")), FName(TEXT("SecondPhase")));

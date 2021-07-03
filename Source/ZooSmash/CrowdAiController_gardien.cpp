@@ -1,5 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "CrowdAiController_gardien.h"
+
 #include "ZooSmash.h"
 #include "ZooSmash/ZooSmashCharacter.h"
 #include "Runtime/Engine/Classes/GameFramework/CharacterMovementComponent.h"
@@ -30,7 +32,6 @@
 
 #include "AIController.h"
 #include "CrowdAiController.h"
-#include "CrowdAiController_gardien.h"
 
 
 void ACrowdAiController_gardien::SecondPhase()

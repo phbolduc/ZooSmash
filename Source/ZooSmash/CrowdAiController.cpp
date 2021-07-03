@@ -1,5 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "CrowdAiController.h"
+
 #include "ZooSmash.h"
 #include "ZooSmash/ZooSmashCharacter.h"
 #include "Runtime/Engine/Classes/GameFramework/CharacterMovementComponent.h"
@@ -27,11 +29,16 @@
 
 #include "CoreMinimal.h"
 #include "GeneratedCodeHelpers.h"
+#include "Runtime/CoreUObject/Public/Templates/SubclassOf.h"
 
 #include "AIController.h"
-#include "CrowdAiController.h"
 
 class UAIAsyncTaskBlueprintProxy;
+class UNavigationSystemV1;
+class UNavigationQueryFilter;
+class ANavigationData;
+template<class TClass>
+class TSubclassOf;
 
 void ACrowdAiController::FirstPhase() {
 	APawn* listPawnAI{};
@@ -48,9 +55,9 @@ void ACrowdAiController::FirstPhase() {
 	int32 SubInt{};
 	bool hasGetPoint{};
 	TArray< FHitResult > sphereOutHit = TArray<FHitResult>();
+	
 
-
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("First phase")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("First phase")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20);
 
 	ChangeSpeedCharacter(250.0f);
 
@@ -62,8 +69,7 @@ void ACrowdAiController::FirstPhase() {
 
 		calcVector = UKismetMathLibrary::Multiply_VectorFloat(actorForwardVector, 500.0f);
 		calcVector = UKismetMathLibrary::Add_VectorVector(location, calcVector);
-		// hasPointInRadius = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, calcVector, randomLocation, 10.0, ((ANavigationData*)nullptr), ((UClass*)nullptr));
-		randomLocation = FVector(0, 0, 0);
+		hasPointInRadius = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, calcVector, randomLocation, 10.0, ((ANavigationData*)nullptr), ((UClass*)nullptr));
 
 		randomVector = UKismetMathLibrary::RandomUnitVector();
 		calcVector = UKismetMathLibrary::Multiply_VectorFloat(randomVector, 100.0f);
@@ -99,8 +105,7 @@ void ACrowdAiController::FirstPhase() {
 		UGameplayStatics::BreakHitResult(sphereOutHit[SubInt], BlockingHit, bInitialOverlap, hitTime, hitDistance, hitLocation, impactPoint, hitNormal,
 			hitNormalImpact, physMat, hitActor, /*out*/ hitComponent, hitBoneName, hitItem, faceIndex, traceStart, traceEnd);
 		currentDest = hitActor;
-		// hasGetPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, impactPoint, dest, 10.000000, ((ANavigationData*)nullptr), ((UClass*)nullptr));
-		dest = FVector(0, 0, 0);
+		hasGetPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, impactPoint, dest, 10.000000, ((ANavigationData*)nullptr), ((UClass*)nullptr));
 
 		WalkTo(dest);
 	}
@@ -108,13 +113,13 @@ void ACrowdAiController::FirstPhase() {
 
 void ACrowdAiController::SecondPhase() {
 
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("Second phase")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("Second phase")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20);
     ACrowdAiController::FirstPhase();
 }
 
 void ACrowdAiController::SecondPhaseFail(EPathFollowingResult::Type moveResult) {
 
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("Fail 2 phase")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("Fail 2 phase")), true, true, FLinearColor(0.0, 0.66, 1.00, 1.00), 20.0);
     ACrowdAiController::FirstPhaseFail(moveResult);
 }
 
@@ -129,7 +134,7 @@ void ACrowdAiController::ChangeSpeedCharacter(float maxSpeed)
 		(*(AccessPrivateProperty<UCharacterMovementComponent* >((nodeCharacter), ACharacter::__PPO__CharacterMovement())))->MaxWalkSpeed = maxSpeed;
 	}
 
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("Speed")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("Speed")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
 }
 
 void ACrowdAiController::WalkTo(FVector dest)
@@ -140,7 +145,7 @@ void ACrowdAiController::WalkTo(FVector dest)
 void ACrowdAiController::WalkTo(FVector dest, float rayon, FName successFunc, FName failFunc)
 {
 
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("Walk to")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("Walk to")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.00);
 	UAIAsyncTaskBlueprintProxy* moveProxy = UAIBlueprintHelperLibrary::CreateMoveToProxyObject(this, ((APawn*)nullptr), dest, ((AActor*)nullptr), rayon, false);
 	if (UKismetSystemLibrary::IsValid(moveProxy))
 	{
@@ -149,12 +154,11 @@ void ACrowdAiController::WalkTo(FVector dest, float rayon, FName successFunc, FN
 		callFail.BindUFunction(this, failFunc);
 		moveProxy->OnSuccess.AddUnique(callSuccess);
 		moveProxy->OnFail.AddUnique(callFail);
-		UKismetSystemLibrary::PrintString(this, FString(TEXT("Success Walk to !!!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+		UKismetSystemLibrary::PrintString(this, FString(TEXT("Success Walk to !!!!")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
 
 	}
 	else {
-
-		UKismetSystemLibrary::PrintString(this, FString(TEXT("Fail Walk to !!!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+		UKismetSystemLibrary::PrintString(this, FString(TEXT("Fail Walk to !!!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20.0);
 	}
 }
 
@@ -198,8 +202,7 @@ void ACrowdAiController::FirstPhaseFail(EPathFollowingResult::Type moveResult)
 	} 
 	else 
 	{
-		// hasRandomPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, aiLocation, randomLocation, 100.0, ((ANavigationData*)nullptr), ((UClass*)nullptr));
-		randomLocation = FVector(0, 0, 0);
+		hasRandomPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, aiLocation, randomLocation, 100.0, ((ANavigationData*)nullptr), ((UClass*)nullptr));
 		WalkTo(randomLocation, 5.0f, FName(TEXT("SecondPhase")), FName(TEXT("SecondPhaseFail")));
 	}
 

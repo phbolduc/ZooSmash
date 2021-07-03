@@ -1,3 +1,6 @@
+
+#include "CrowdAiController_Elite.h"
+
 #include "ZooSmash.h"
 #include "ZooSmash/ZooSmashCharacter.h"
 #include "Runtime/Engine/Classes/GameFramework/CharacterMovementComponent.h"
@@ -29,7 +32,6 @@
 #include "AIController.h"
 #include "CrowdAiController.h"
 #include "CrowdAiController_gardien.h"
-#include "CrowdAiController_Elite.h"
 
 
 void ACrowdAiController_Elite::SecondPhase()
