@@ -31,17 +31,17 @@
 
 #include "AIController.h"
 #include "CrowdAiController.h"
-#include "CrowdAiController_gardien.generated.h"
+#include "CrowdAiController_gardien.h"
+#include "CrowdAiController_Elite.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ZOOSMASH_API ACrowdAiController_gardien : public ACrowdAiController
+class ZOOSMASH_API ACrowdAiController_Elite : public ACrowdAiController_gardien
 {
 	GENERATED_BODY()
 
 	protected:
 		virtual void SecondPhase() override;
-		virtual void SecondPhaseFail(EPathFollowingResult::Type moveResult) override;
 };

@@ -49,6 +49,9 @@ void ACrowdAiController::FirstPhase() {
 	bool hasGetPoint{};
 	TArray< FHitResult > sphereOutHit = TArray<FHitResult>();
 
+
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("First phase")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+
 	ChangeSpeedCharacter(250.0f);
 
 	listPawnAI = AController::K2_GetPawn();
@@ -104,10 +107,14 @@ void ACrowdAiController::FirstPhase() {
 }
 
 void ACrowdAiController::SecondPhase() {
+
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("Second phase")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
     ACrowdAiController::FirstPhase();
 }
 
 void ACrowdAiController::SecondPhaseFail(EPathFollowingResult::Type moveResult) {
+
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("Fail 2 phase")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
     ACrowdAiController::FirstPhaseFail(moveResult);
 }
 
@@ -121,6 +128,8 @@ void ACrowdAiController::ChangeSpeedCharacter(float maxSpeed)
 	{
 		(*(AccessPrivateProperty<UCharacterMovementComponent* >((nodeCharacter), ACharacter::__PPO__CharacterMovement())))->MaxWalkSpeed = maxSpeed;
 	}
+
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("Speed")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
 }
 
 void ACrowdAiController::WalkTo(FVector dest)
@@ -130,6 +139,8 @@ void ACrowdAiController::WalkTo(FVector dest)
 
 void ACrowdAiController::WalkTo(FVector dest, float rayon, FName successFunc, FName failFunc)
 {
+
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("Walk to")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
 	UAIAsyncTaskBlueprintProxy* moveProxy = UAIBlueprintHelperLibrary::CreateMoveToProxyObject(this, ((APawn*)nullptr), dest, ((AActor*)nullptr), rayon, false);
 	if (UKismetSystemLibrary::IsValid(moveProxy))
 	{
@@ -138,37 +149,24 @@ void ACrowdAiController::WalkTo(FVector dest, float rayon, FName successFunc, FN
 		callFail.BindUFunction(this, failFunc);
 		moveProxy->OnSuccess.AddUnique(callSuccess);
 		moveProxy->OnFail.AddUnique(callFail);
+		UKismetSystemLibrary::PrintString(this, FString(TEXT("Success Walk to !!!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+
+	}
+	else {
+
+		UKismetSystemLibrary::PrintString(this, FString(TEXT("Fail Walk to !!!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
 	}
 }
 
 
 void ACrowdAiController::MoveSuccess(EPathFollowingResult::Type moveResult)
 {
-	APawn* playerPawn{};
-	APawn* AiPawn{};
-	FVector playerLocation(EForceInit::ForceInit);
-	FVector aiLocation(EForceInit::ForceInit);
-	float distance{};
-	bool isLess{};
-
-	playerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	AiPawn = AController::K2_GetPawn();
-	if (UKismetSystemLibrary::IsValid(playerPawn))
+	if (IsFarOfPlayer())
 	{
-		playerLocation = playerPawn->AActor::K2_GetActorLocation();
-	}
-	if (UKismetSystemLibrary::IsValid(AiPawn))
-	{
-		aiLocation = AiPawn->AActor::K2_GetActorLocation();
-	}
-	distance = UKismetMathLibrary::Vector_Distance(aiLocation, playerLocation);
-	isLess = UKismetMathLibrary::Less_FloatFloat(distance, 4 * SearchRadius);
-	if (!isLess)
-	{
-		FirstPhase();
+		this->FirstPhase();
 	}
 	else {
-		SecondPhase();
+		this->SecondPhase();
 	}
 }
 
@@ -179,39 +177,57 @@ void ACrowdAiController::FirstPhaseFail(EPathFollowingResult::Type moveResult)
 	FVector playerLocation(EForceInit::ForceInit);
 	FVector aiLocation(EForceInit::ForceInit);
 	FVector randomLocation;
-	float distance{};
-	float rayon{};
-	bool isSmaller{};
 	bool hasRandomPoint{};
 
 	playPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	aiPawn = AController::K2_GetPawn();
-	if (UKismetSystemLibrary::IsValid(playPawn))
+	if (!UKismetSystemLibrary::IsValid(playPawn) || !UKismetSystemLibrary::IsValid(aiPawn))
 	{
-		playerLocation = playPawn->AActor::K2_GetActorLocation();
-	}
-	if (UKismetSystemLibrary::IsValid(aiPawn))
-	{
-		aiLocation = aiPawn->AActor::K2_GetActorLocation();
-	}
-	distance = UKismetMathLibrary::Vector_Distance(aiLocation, playerLocation);
-	rayon = 4 * SearchRadius;
-	isSmaller = UKismetMathLibrary::Less_FloatFloat(distance, rayon);
-	if (!isSmaller)
-	{
-		isSmaller = UKismetMathLibrary::Greater_FloatFloat(distance, rayon);
-		if (isSmaller)
-		{
-			UKismetSystemLibrary::Delay(this, 0.200000, FLatentActionInfo(2, -41540233, TEXT("ExecuteUbergraph_crowdMainControler_0"), this));
-		}
+		UKismetSystemLibrary::PrintString(this, FString(TEXT("Error componant")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+		UKismetSystemLibrary::Delay(this, 0.200000, FLatentActionInfo(2, -41540233, TEXT("ExecuteUbergraph_crowdMainControler_0"), this));
+		MoveSuccess(moveResult);
 	}
 
-	if(isSmaller) {
+	playerLocation = playPawn->AActor::K2_GetActorLocation();
+	aiLocation = aiPawn->AActor::K2_GetActorLocation();
+	
+	if (IsFarOfPlayer())
+	{
+		UKismetSystemLibrary::Delay(this, 0.200000, FLatentActionInfo(2, -41540233, TEXT("ExecuteUbergraph_crowdMainControler_0"), this));
+		MoveSuccess(moveResult);
+	} 
+	else 
+	{
 		// hasRandomPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, aiLocation, randomLocation, 100.0, ((ANavigationData*)nullptr), ((UClass*)nullptr));
 		randomLocation = FVector(0, 0, 0);
-		
 		WalkTo(randomLocation, 5.0f, FName(TEXT("SecondPhase")), FName(TEXT("SecondPhaseFail")));
 	}
+
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("Fail move")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+}
+
+bool ACrowdAiController::IsFarOfPlayer()
+{
+	APawn* playPawn{};
+	APawn* aiPawn{};
+	FVector playerLocation(EForceInit::ForceInit);
+	FVector aiLocation(EForceInit::ForceInit);
+	float distance{};
+	float rayon{};
+	bool isSmaller = true;
+	bool hasRandomPoint{};
+
+	aiPawn = AController::K2_GetPawn();
+	if (UKismetSystemLibrary::IsValid(playPawn) && UKismetSystemLibrary::IsValid(aiPawn))
+	{
+		playerLocation = playPawn->AActor::K2_GetActorLocation();
+		aiLocation = aiPawn->AActor::K2_GetActorLocation();
+		distance = UKismetMathLibrary::Vector_Distance(aiLocation, playerLocation);
+		rayon = 4 * SearchRadius;
+		isSmaller = UKismetMathLibrary::Less_FloatFloat(distance, rayon);
+	}
+
+	return isSmaller;
 }
 
 /**

@@ -57,5 +57,6 @@ class ZOOSMASH_API ACrowdAiController : public AAIController
 		virtual void WalkTo(FVector dest, float rayon, FName successFunc, FName failFunc);
 		virtual void MoveSuccess(EPathFollowingResult::Type moveResult);
 		virtual void ChangeSpeedCharacter(float maxSpeed);
+		virtual bool IsFarOfPlayer();
 
 };

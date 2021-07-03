@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "ZooSmash.h"
 #include "ZooSmash/ZooSmashCharacter.h"
 #include "Runtime/Engine/Classes/GameFramework/CharacterMovementComponent.h"
@@ -31,46 +29,43 @@
 #include "AIController.h"
 #include "CrowdAiController.h"
 #include "CrowdAiController_gardien.h"
+#include "CrowdAiController_Elite.h"
 
 
-void ACrowdAiController_gardien::SecondPhase()
+void ACrowdAiController_Elite::SecondPhase()
 {
 	APawn* PlayerPawn{};
-	FVector location(EForceInit::ForceInit);
+	FVector forwardPlayer(EForceInit::ForceInit);
+	FVector playerLocation(EForceInit::ForceInit);
 	APawn* AiPawn{};
-	FVector AiLocation(EForceInit::ForceInit);
+	FVector forwardAi(EForceInit::ForceInit);
+	FVector aiLocation(EForceInit::ForceInit);
 	FVector NewDir(EForceInit::ForceInit);
 	FVector dest;
 	float searchEffect{};
 	FVector MoveVector(EForceInit::ForceInit);
 	bool hasPoint{};
 
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("Fear !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("Elite !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
 
 	PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	if (::IsValid(PlayerPawn))
-	{
-		location = PlayerPawn->AActor::K2_GetActorLocation();
-	}
-
 	AiPawn = AController::K2_GetPawn();
 
+	if (::IsValid(PlayerPawn))
+	{
+		playerLocation = PlayerPawn->AActor::K2_GetActorLocation();
+		forwardPlayer = PlayerPawn->AActor::GetActorForwardVector();
+	}
 	if (::IsValid(AiPawn))
 	{
-		AiLocation = AiPawn->AActor::K2_GetActorLocation();
+		forwardAi = AiPawn->AActor::GetActorForwardVector();
+		aiLocation = AiPawn->AActor::K2_GetActorLocation();
 	}
-}
 
-void ACrowdAiController_gardien::SecondPhaseFail(EPathFollowingResult::Type moveResult)
-{
-	if (Super::IsFarOfPlayer())
-	{
-		SecondPhase();
-	}
-	else {
-		SecondPhase();
-	}
-}
+	NewDir = FVector::CrossProduct(aiLocation, forwardPlayer);
+	NewDir = UKismetMathLibrary::Normal(NewDir, 0.000100);
+	MoveVector = UKismetMathLibrary::Multiply_VectorFloat(NewDir, 2 * SearchRadius);
+	MoveVector = UKismetMathLibrary::Add_VectorVector(aiLocation, MoveVector);
 
-// void ACrowdAiController_gardien::Shoot()
-// void ACrowdAiController_gardien::lookAt()
+	Super::WalkTo(MoveVector);
+}
