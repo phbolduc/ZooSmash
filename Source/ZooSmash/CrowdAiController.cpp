@@ -147,24 +147,44 @@ void ACrowdAiController::WalkTo(FVector dest, float rayon, FName successFunc, FN
 
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("Walk to")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.00);
 	UAIAsyncTaskBlueprintProxy* moveProxy = UAIBlueprintHelperLibrary::CreateMoveToProxyObject(this, ((APawn*)nullptr), dest, ((AActor*)nullptr), rayon, false);
+
+	return; //KCST_EndOfThread
+
 	if (UKismetSystemLibrary::IsValid(moveProxy))
 	{
-		TScriptDelegate<FWeakObjectPtr> callSuccess, callFail;
-		callSuccess.BindUFunction(this, successFunc);
-		callFail.BindUFunction(this, failFunc);
-		moveProxy->OnSuccess.AddUnique(callSuccess);
-		moveProxy->OnFail.AddUnique(callFail);
-		UKismetSystemLibrary::PrintString(this, FString(TEXT("Success Walk to !!!!")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
+		FString textToPrint = FString(TEXT("id : "));
+		textToPrint.AppendInt(moveProxy->MoveRequestId.GetID());
+		UKismetSystemLibrary::PrintString(this, textToPrint, true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
 
+		/*TScriptDelegate<FWeakObjectPtr> callSuccess, callFail;
+		callSuccess.BindUFunction(this, successFunc);
+		UKismetSystemLibrary::PrintString(this, successFunc.ToString(), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
+
+		callFail.BindUFunction(this, failFunc);
+		UKismetSystemLibrary::PrintString(this, failFunc.ToString(), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
+
+		moveProxy->OnSuccess.AddUnique(callSuccess);
+		moveProxy->OnFail.AddUnique(callFail);*/
+		moveProxy->OnSuccess.AddDynamic(this, &ACrowdAiController::MoveSuccess);
+		moveProxy->OnFail.AddDynamic(this, &ACrowdAiController::FirstPhaseFail);
+		
+		UKismetSystemLibrary::PrintString(this, FString(TEXT("Success Walk to !!!!")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
 	}
 	else {
 		UKismetSystemLibrary::PrintString(this, FString(TEXT("Fail Walk to !!!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20.0);
+		MoveSuccess();
 	}
 }
 
-
 void ACrowdAiController::MoveSuccess(EPathFollowingResult::Type moveResult)
 {
+	MoveSuccess();
+}
+
+void ACrowdAiController::MoveSuccess()
+{
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("OnSuccess work!!!")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.00);
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("MoveSuccess!!!!")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.00);
 	if (IsFarOfPlayer())
 	{
 		this->FirstPhase();
@@ -176,6 +196,7 @@ void ACrowdAiController::MoveSuccess(EPathFollowingResult::Type moveResult)
 
 void ACrowdAiController::FirstPhaseFail(EPathFollowingResult::Type moveResult)
 {
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("!!!MoveFail!!!!")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.00);
 	APawn* playPawn{};
 	APawn* aiPawn{};
 	FVector playerLocation(EForceInit::ForceInit);
@@ -188,8 +209,7 @@ void ACrowdAiController::FirstPhaseFail(EPathFollowingResult::Type moveResult)
 	if (!UKismetSystemLibrary::IsValid(playPawn) || !UKismetSystemLibrary::IsValid(aiPawn))
 	{
 		UKismetSystemLibrary::PrintString(this, FString(TEXT("Error componant")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
-		UKismetSystemLibrary::Delay(this, 0.200000, FLatentActionInfo(2, -41540233, TEXT("ExecuteUbergraph_crowdMainControler_0"), this));
-		MoveSuccess(moveResult);
+		UKismetSystemLibrary::Delay(this, 0.200000, FLatentActionInfo(2, -41540233, TEXT("MoveSuccess"), this));
 	}
 
 	playerLocation = playPawn->AActor::K2_GetActorLocation();
@@ -197,8 +217,7 @@ void ACrowdAiController::FirstPhaseFail(EPathFollowingResult::Type moveResult)
 	
 	if (IsFarOfPlayer())
 	{
-		UKismetSystemLibrary::Delay(this, 0.200000, FLatentActionInfo(2, -41540233, TEXT("ExecuteUbergraph_crowdMainControler_0"), this));
-		MoveSuccess(moveResult);
+		UKismetSystemLibrary::Delay(this, 0.200000, FLatentActionInfo(2, -41540233, TEXT("MoveSuccess"), this));
 	} 
 	else 
 	{
@@ -206,7 +225,6 @@ void ACrowdAiController::FirstPhaseFail(EPathFollowingResult::Type moveResult)
 		WalkTo(randomLocation, 5.0f, FName(TEXT("SecondPhase")), FName(TEXT("SecondPhaseFail")));
 	}
 
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("Fail move")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
 }
 
 bool ACrowdAiController::IsFarOfPlayer()

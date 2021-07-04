@@ -30,9 +30,11 @@
 #include "GeneratedCodeHelpers.h"
 
 #include "AIController.h"
-#include "CrowdAiController.generated.h"
 
 class UAIAsyncTaskBlueprintProxy;
+
+#include "CrowdAiController.generated.h"
+
 
 /**
  * 
@@ -49,13 +51,19 @@ class ZOOSMASH_API ACrowdAiController : public AAIController
 		AActor* currentDest = nullptr;
 
 		virtual void BeginPlay() override;
+
 		virtual void FirstPhase();
 		virtual void FirstPhaseFail(EPathFollowingResult::Type moveResult);
+
 		virtual void SecondPhase();
 		virtual void SecondPhaseFail(EPathFollowingResult::Type moveResult);
+
 		virtual void WalkTo(FVector dest);
 		virtual void WalkTo(FVector dest, float rayon, FName successFunc, FName failFunc);
+
 		virtual void MoveSuccess(EPathFollowingResult::Type moveResult);
+		virtual void MoveSuccess();
+
 		virtual void ChangeSpeedCharacter(float maxSpeed);
 		virtual bool IsFarOfPlayer();
 

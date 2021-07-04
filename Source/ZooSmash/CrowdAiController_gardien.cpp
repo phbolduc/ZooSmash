@@ -34,44 +34,40 @@
 #include "CrowdAiController.h"
 
 
+void ACrowdAiController_gardien::Tick(float DeltaSeconds) {
+	Super::Tick(DeltaSeconds);
+	if (!Super::IsFarOfPlayer()) {
+		LookAt();
+	}
+}
+
 void ACrowdAiController_gardien::SecondPhase()
-{
-	APawn* PlayerPawn{};
-	FVector location(EForceInit::ForceInit);
-	APawn* AiPawn{};
-	FVector AiLocation(EForceInit::ForceInit);
-	FVector NewDir(EForceInit::ForceInit);
-	FVector dest;
-	float searchEffect{};
-	FVector MoveVector(EForceInit::ForceInit);
-	bool hasPoint{};
-
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("Fear !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
-
-	PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	if (::IsValid(PlayerPawn))
-	{
-		location = PlayerPawn->AActor::K2_GetActorLocation();
-	}
-
-	AiPawn = AController::K2_GetPawn();
-
-	if (::IsValid(AiPawn))
-	{
-		AiLocation = AiPawn->AActor::K2_GetActorLocation();
-	}
+{	
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("prep to shoot")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+	UKismetSystemLibrary::Delay(this, 0.200000, FLatentActionInfo(2, -41540233, TEXT("Shoot"), this));
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("has shoot")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
 }
 
 void ACrowdAiController_gardien::SecondPhaseFail(EPathFollowingResult::Type moveResult)
 {
-	if (Super::IsFarOfPlayer())
-	{
-		SecondPhase();
-	}
-	else {
-		SecondPhase();
-	}
+	Super::MoveSuccess();
 }
 
-// void ACrowdAiController_gardien::Shoot()
-// void ACrowdAiController_gardien::lookAt()
+void ACrowdAiController_gardien::Shoot() {
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("Shoot !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+}
+
+void ACrowdAiController_gardien::LookAt() {
+
+	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	APawn* AiPawn = AController::K2_GetPawn();
+	FVector playerLocation(EForceInit::ForceInit);
+	FVector aiLocation(EForceInit::ForceInit);
+
+	if (::IsValid(PlayerPawn) && ::IsValid(AiPawn))
+	{
+		playerLocation = PlayerPawn->AActor::K2_GetActorLocation();
+		aiLocation = AiPawn->AActor::K2_GetActorLocation();
+		UKismetMathLibrary::FindLookAtRotation(playerLocation, aiLocation);
+	}
+}

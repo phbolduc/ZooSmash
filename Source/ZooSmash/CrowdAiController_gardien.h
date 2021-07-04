@@ -42,6 +42,11 @@ class ZOOSMASH_API ACrowdAiController_gardien : public ACrowdAiController
 	GENERATED_BODY()
 
 	protected:
+		virtual void Tick(float DeltaSeconds) override;
+
 		virtual void SecondPhase() override;
 		virtual void SecondPhaseFail(EPathFollowingResult::Type moveResult) override;
+
+		virtual void Shoot();
+		virtual void LookAt();
 };
