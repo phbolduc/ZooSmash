@@ -156,7 +156,7 @@ void ACrowdAiController::WalkTo(FVector dest, float rayon, FName successFunc, FN
 		textToPrint.AppendInt(moveProxy->MoveRequestId.GetID());
 		UKismetSystemLibrary::PrintString(this, textToPrint, true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
 
-		/*TScriptDelegate<FWeakObjectPtr> callSuccess, callFail;
+		TScriptDelegate<FWeakObjectPtr> callSuccess, callFail;
 		callSuccess.BindUFunction(this, successFunc);
 		UKismetSystemLibrary::PrintString(this, successFunc.ToString(), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
 
@@ -164,9 +164,10 @@ void ACrowdAiController::WalkTo(FVector dest, float rayon, FName successFunc, FN
 		UKismetSystemLibrary::PrintString(this, failFunc.ToString(), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
 
 		moveProxy->OnSuccess.AddUnique(callSuccess);
-		moveProxy->OnFail.AddUnique(callFail);*/
-		moveProxy->OnSuccess.AddDynamic(this, &ACrowdAiController::MoveSuccess);
-		moveProxy->OnFail.AddDynamic(this, &ACrowdAiController::FirstPhaseFail);
+		moveProxy->OnFail.AddUnique(callFail);
+		
+		//moveProxy->OnSuccess.AddDynamic(this, &ACrowdAiController::MoveSuccess);
+		//moveProxy->OnFail.AddDynamic(this, &ACrowdAiController::FirstPhaseFail);
 		
 		UKismetSystemLibrary::PrintString(this, FString(TEXT("Success Walk to !!!!")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
 	}
