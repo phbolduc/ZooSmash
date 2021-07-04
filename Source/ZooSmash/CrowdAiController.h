@@ -46,7 +46,7 @@ class ZOOSMASH_API ACrowdAiController : public AAIController
 
 	protected:
 
-		const float InitSearchRadius = 300.0f;
+		const float InitSearchRadius = 600.0f;
 		float SearchRadius = 200.0f;
 		AActor* currentDest = nullptr;
 
@@ -66,5 +66,4 @@ class ZOOSMASH_API ACrowdAiController : public AAIController
 
 		virtual void ChangeSpeedCharacter(float maxSpeed);
 		virtual bool IsFarOfPlayer();
-
 };

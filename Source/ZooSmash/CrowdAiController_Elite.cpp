@@ -53,21 +53,19 @@ void ACrowdAiController_Elite::SecondPhase()
 	PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	AiPawn = AController::K2_GetPawn();
 
-	if (::IsValid(PlayerPawn))
+	if (::IsValid(PlayerPawn) && ::IsValid(AiPawn))
 	{
 		playerLocation = PlayerPawn->AActor::K2_GetActorLocation();
 		forwardPlayer = PlayerPawn->AActor::GetActorForwardVector();
-	}
-	if (::IsValid(AiPawn))
-	{
 		forwardAi = AiPawn->AActor::GetActorForwardVector();
 		aiLocation = AiPawn->AActor::K2_GetActorLocation();
+
+		NewDir = FVector::CrossProduct(aiLocation, forwardPlayer);
+		NewDir = UKismetMathLibrary::Normal(NewDir, 0.000100);
+		MoveVector = UKismetMathLibrary::Multiply_VectorFloat(NewDir, 2 * SearchRadius);
+		MoveVector = UKismetMathLibrary::Add_VectorVector(aiLocation, MoveVector);
+
+		Super::WalkTo(MoveVector);
 	}
 
-	NewDir = FVector::CrossProduct(aiLocation, forwardPlayer);
-	NewDir = UKismetMathLibrary::Normal(NewDir, 0.000100);
-	MoveVector = UKismetMathLibrary::Multiply_VectorFloat(NewDir, 2 * SearchRadius);
-	MoveVector = UKismetMathLibrary::Add_VectorVector(aiLocation, MoveVector);
-
-	Super::WalkTo(MoveVector);
 }

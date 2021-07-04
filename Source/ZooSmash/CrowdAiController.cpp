@@ -133,8 +133,6 @@ void ACrowdAiController::ChangeSpeedCharacter(float maxSpeed)
 	{
 		(*(AccessPrivateProperty<UCharacterMovementComponent* >((nodeCharacter), ACharacter::__PPO__CharacterMovement())))->MaxWalkSpeed = maxSpeed;
 	}
-
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("Speed")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
 }
 
 void ACrowdAiController::WalkTo(FVector dest)
@@ -158,18 +156,15 @@ void ACrowdAiController::WalkTo(FVector dest, float rayon, FName successFunc, FN
 
 		TScriptDelegate<FWeakObjectPtr> callSuccess, callFail;
 		callSuccess.BindUFunction(this, successFunc);
-		UKismetSystemLibrary::PrintString(this, successFunc.ToString(), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
 
 		callFail.BindUFunction(this, failFunc);
-		UKismetSystemLibrary::PrintString(this, failFunc.ToString(), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
 
-		moveProxy->OnSuccess.AddUnique(callSuccess);
-		moveProxy->OnFail.AddUnique(callFail);
+		//moveProxy->OnSuccess.AddUnique(callSuccess);
+		//moveProxy->OnFail.AddUnique(callFail);
 		
 		//moveProxy->OnSuccess.AddDynamic(this, &ACrowdAiController::MoveSuccess);
 		//moveProxy->OnFail.AddDynamic(this, &ACrowdAiController::FirstPhaseFail);
-		
-		UKismetSystemLibrary::PrintString(this, FString(TEXT("Success Walk to !!!!")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
+		MoveSuccess();
 	}
 	else {
 		UKismetSystemLibrary::PrintString(this, FString(TEXT("Fail Walk to !!!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20.0);
@@ -184,7 +179,6 @@ void ACrowdAiController::MoveSuccess(EPathFollowingResult::Type moveResult)
 
 void ACrowdAiController::MoveSuccess()
 {
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("OnSuccess work!!!")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.00);
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("MoveSuccess!!!!")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.00);
 	if (IsFarOfPlayer())
 	{
@@ -197,7 +191,6 @@ void ACrowdAiController::MoveSuccess()
 
 void ACrowdAiController::FirstPhaseFail(EPathFollowingResult::Type moveResult)
 {
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("!!!MoveFail!!!!")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.00);
 	APawn* playPawn{};
 	APawn* aiPawn{};
 	FVector playerLocation(EForceInit::ForceInit);
@@ -239,7 +232,9 @@ bool ACrowdAiController::IsFarOfPlayer()
 	bool isSmaller = true;
 	bool hasRandomPoint{};
 
+	playPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	aiPawn = AController::K2_GetPawn();
+
 	if (UKismetSystemLibrary::IsValid(playPawn) && UKismetSystemLibrary::IsValid(aiPawn))
 	{
 		playerLocation = playPawn->AActor::K2_GetActorLocation();
@@ -261,5 +256,5 @@ void ACrowdAiController::BeginPlay()
 
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("Start")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
 	SearchRadius = InitSearchRadius;
-	FirstPhase();
+	MoveSuccess();
 }
