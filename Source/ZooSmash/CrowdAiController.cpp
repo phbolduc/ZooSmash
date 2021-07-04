@@ -159,12 +159,12 @@ void ACrowdAiController::WalkTo(FVector dest, float rayon, FName successFunc, FN
 
 		callFail.BindUFunction(this, failFunc);
 
-		//moveProxy->OnSuccess.AddUnique(callSuccess);
-		//moveProxy->OnFail.AddUnique(callFail);
+		moveProxy->OnSuccess.AddUnique(callSuccess);
+		moveProxy->OnFail.AddUnique(callFail);
 		
 		//moveProxy->OnSuccess.AddDynamic(this, &ACrowdAiController::MoveSuccess);
 		//moveProxy->OnFail.AddDynamic(this, &ACrowdAiController::FirstPhaseFail);
-		MoveSuccess();
+		//MoveSuccess();
 	}
 	else {
 		UKismetSystemLibrary::PrintString(this, FString(TEXT("Fail Walk to !!!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20.0);
@@ -241,7 +241,14 @@ bool ACrowdAiController::IsFarOfPlayer()
 		aiLocation = aiPawn->AActor::K2_GetActorLocation();
 		distance = UKismetMathLibrary::Vector_Distance(aiLocation, playerLocation);
 		rayon = 4 * SearchRadius;
-		isSmaller = UKismetMathLibrary::Less_FloatFloat(distance, rayon);
+		isSmaller = UKismetMathLibrary::Less_FloatFloat(rayon, distance);
+
+		if (isSmaller) {
+			UKismetSystemLibrary::PrintString(this, FString(TEXT("isSmaller")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20.0);
+		} 
+		else {
+			UKismetSystemLibrary::PrintString(this, FString(TEXT("isBig")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20.0);
+		}
 	}
 
 	return isSmaller;

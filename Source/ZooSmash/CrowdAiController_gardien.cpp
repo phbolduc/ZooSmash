@@ -32,20 +32,29 @@
 
 #include "AIController.h"
 #include "CrowdAiController.h"
+#include "MyAICharacter.h"
 
 
 void ACrowdAiController_gardien::Tick(float DeltaSeconds) {
 	Super::Tick(DeltaSeconds);
-	if (!Super::IsFarOfPlayer()) {
+	ACharacter* characterAI = AController::GetCharacter();
+	(static_cast<AMyAICharacter*>(characterAI))->OnShoot();
+	/*if (!Super::IsFarOfPlayer()) {
 		LookAt();
-	}
+	}*/
 }
 
 void ACrowdAiController_gardien::SecondPhase()
 {	
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("prep to shoot")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
-	UKismetSystemLibrary::Delay(this, 0.200000, FLatentActionInfo(2, -41540233, TEXT("Shoot"), this));
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("has shoot")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+	FTimerHandle _loopTimerHandle;
+	FTimerHandle _loopTimerHandle2;
+	GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle, this, &ACrowdAiController_gardien::Shoot, 0.1f, false);
+	GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle2, this, &ACrowdAiController_gardien::MoveSuccess, 0.10f, false);
+}
+
+void ACrowdAiController_gardien::MoveSuccess()
+{
+	Super::MoveSuccess();
 }
 
 void ACrowdAiController_gardien::SecondPhaseFail(EPathFollowingResult::Type moveResult)
@@ -56,11 +65,15 @@ void ACrowdAiController_gardien::SecondPhaseFail(EPathFollowingResult::Type move
 void ACrowdAiController_gardien::Shoot() {
 
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("Shoot !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
-	OnShoot();
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("Shoot !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("Shoot !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+	ACharacter* characterAI = AController::GetCharacter();
+	(static_cast<AMyAICharacter*>(characterAI))->OnShoot();
 }
 
 void ACrowdAiController_gardien::LookAt() {
 
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("look")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20);
 	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	APawn* AiPawn = AController::K2_GetPawn();
 	FVector playerLocation(EForceInit::ForceInit);
