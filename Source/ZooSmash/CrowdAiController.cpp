@@ -59,7 +59,7 @@ void ACrowdAiController::FirstPhase() {
 
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("First phase")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20);
 
-	ChangeSpeedCharacter(250.0f);
+	ChangeSpeedCharacter(defaultSpeed);
 
 	listPawnAI = AController::K2_GetPawn();
 	if (::IsValid(listPawnAI) && ::IsValid(listPawnAI))
