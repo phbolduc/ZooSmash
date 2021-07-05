@@ -37,6 +37,18 @@
 
 void ACrowdAiController_Elite::SecondPhase()
 {
+	UKismetSystemLibrary::PrintString(this, FString(TEXT("Elite !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+	
+	FTimerHandle _loopTimerHandle;
+	
+	Super::LookAt();
+	Super::Shoot();
+	GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle, this, &ACrowdAiController_Elite::MoveAfterShoot, 0.1f, false);
+	
+}
+
+void ACrowdAiController_Elite::MoveAfterShoot()
+{
 	APawn* PlayerPawn{};
 	FVector forwardPlayer(EForceInit::ForceInit);
 	FVector playerLocation(EForceInit::ForceInit);
@@ -56,9 +68,6 @@ void ACrowdAiController_Elite::SecondPhase()
 
 	if (::IsValid(PlayerPawn) && ::IsValid(AiPawn))
 	{
-		Super::isSafe = false;
-		Super::Shoot();
-		Super::isSafe = true;
 
 		forwardPlayer = PlayerPawn->AActor::GetActorForwardVector();
 		playerLocation = PlayerPawn->AActor::K2_GetActorLocation();
