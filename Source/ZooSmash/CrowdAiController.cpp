@@ -161,7 +161,9 @@ void ACrowdAiController::WalkTo(FVector dest, float rayon, FName successFunc, FN
 
 		moveProxy->OnSuccess.AddUnique(callSuccess);
 		moveProxy->OnFail.AddUnique(callFail);
-		
+
+		// Ligne temporaire PATCH;
+		GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle2, this, &ACrowdAiController::MoveSuccess, 0.10f, false);
 		//moveProxy->OnSuccess.AddDynamic(this, &ACrowdAiController::MoveSuccess);
 		//moveProxy->OnFail.AddDynamic(this, &ACrowdAiController::FirstPhaseFail);
 		//MoveSuccess();

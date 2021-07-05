@@ -38,15 +38,12 @@ void ACrowdAiController_Elite::SecondPhase()
 {
 	APawn* PlayerPawn{};
 	FVector forwardPlayer(EForceInit::ForceInit);
-	FVector playerLocation(EForceInit::ForceInit);
+
 	APawn* AiPawn{};
-	FVector forwardAi(EForceInit::ForceInit);
 	FVector aiLocation(EForceInit::ForceInit);
-	FVector NewDir(EForceInit::ForceInit);
+
 	FVector dest;
-	float searchEffect{};
 	FVector MoveVector(EForceInit::ForceInit);
-	bool hasPoint{};
 
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("Elite !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
 
@@ -55,17 +52,18 @@ void ACrowdAiController_Elite::SecondPhase()
 
 	if (::IsValid(PlayerPawn) && ::IsValid(AiPawn))
 	{
-		playerLocation = PlayerPawn->AActor::K2_GetActorLocation();
+		isSafe = Super::IsFarOfPlayer();
+		Super::Shoot();
+		isSafe = true;
+
 		forwardPlayer = PlayerPawn->AActor::GetActorForwardVector();
-		forwardAi = AiPawn->AActor::GetActorForwardVector();
 		aiLocation = AiPawn->AActor::K2_GetActorLocation();
+		MoveVector = forwardPlayer.RotateVector(90.0f, FVector(0,1,0));
+		dest = UKismetMathLibrary::Add_VectorVector(aiLocation, MoveVector * 5);
 
-		NewDir = FVector::CrossProduct(aiLocation, forwardPlayer);
-		NewDir = UKismetMathLibrary::Normal(NewDir, 0.000100);
-		MoveVector = UKismetMathLibrary::Multiply_VectorFloat(NewDir, 2 * SearchRadius);
-		MoveVector = UKismetMathLibrary::Add_VectorVector(aiLocation, MoveVector);
-
-		Super::WalkTo(MoveVector);
+		Super::WalkTo(dest);
 	}
-
+	else {
+		Super::MoveSuccess();
+	}
 }

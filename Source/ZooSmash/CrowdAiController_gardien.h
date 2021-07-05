@@ -42,6 +42,8 @@ class ZOOSMASH_API ACrowdAiController_gardien : public ACrowdAiController
 	GENERATED_BODY()
 
 	protected:
+		bool isSafe = true;
+
 		virtual void Tick(float DeltaSeconds) override;
 		virtual void MoveSuccess() override;
 
@@ -50,8 +52,4 @@ class ZOOSMASH_API ACrowdAiController_gardien : public ACrowdAiController
 
 		virtual void Shoot();
 		virtual void LookAt();
-
-		// Create Event
-		/*UFUNCTION(BlueprintImplementableEvent, Category = "crowd_man")
-			void OnShoot();*/
 };

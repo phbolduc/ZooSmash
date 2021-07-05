@@ -34,36 +34,38 @@
 #include "CrowdAiController.h"
 #include "MyAICharacter.h"
 
-
-void ACrowdAiController_gardien::Tick(float DeltaSeconds) {
+void ACrowdAiController_gardien::Tick(float DeltaSeconds) 
+{
 	Super::Tick(DeltaSeconds);
 	ACharacter* characterAI = AController::GetCharacter();
 	(static_cast<AMyAICharacter*>(characterAI))->OnShoot();
-	/*if (!Super::IsFarOfPlayer()) {
+	if (!isSafe) {
 		LookAt();
-	}*/
+	}
 }
 
 void ACrowdAiController_gardien::SecondPhase()
 {	
 	FTimerHandle _loopTimerHandle;
 	FTimerHandle _loopTimerHandle2;
+	isSafe = Super::IsFarOfPlayer();
 	GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle, this, &ACrowdAiController_gardien::Shoot, 0.1f, false);
 	GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle2, this, &ACrowdAiController_gardien::MoveSuccess, 0.10f, false);
 }
 
 void ACrowdAiController_gardien::MoveSuccess()
 {
+	isSafe = Super::IsFarOfPlayer();
 	Super::MoveSuccess();
 }
 
 void ACrowdAiController_gardien::SecondPhaseFail(EPathFollowingResult::Type moveResult)
 {
-	Super::MoveSuccess();
+	ACrowdAiController_gardien::MoveSuccess();
 }
 
-void ACrowdAiController_gardien::Shoot() {
-
+void ACrowdAiController_gardien::Shoot() 
+{
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("Shoot !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("Shoot !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("Shoot !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
@@ -71,8 +73,8 @@ void ACrowdAiController_gardien::Shoot() {
 	(static_cast<AMyAICharacter*>(characterAI))->OnShoot();
 }
 
-void ACrowdAiController_gardien::LookAt() {
-
+void ACrowdAiController_gardien::LookAt() 
+{
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("look")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20);
 	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	APawn* AiPawn = AController::K2_GetPawn();
