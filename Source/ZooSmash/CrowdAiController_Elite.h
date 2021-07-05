@@ -44,4 +44,5 @@ class ZOOSMASH_API ACrowdAiController_Elite : public ACrowdAiController_gardien
 
 	protected:
 		virtual void SecondPhase() override;
+		virtual void MoveAfterShoot();
 };
