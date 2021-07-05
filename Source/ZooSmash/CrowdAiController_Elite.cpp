@@ -34,19 +34,20 @@
 #include "CrowdAiController_gardien.h"
 
 
+
 void ACrowdAiController_Elite::SecondPhase()
 {
 	APawn* PlayerPawn{};
 	FVector forwardPlayer(EForceInit::ForceInit);
 	FVector playerLocation(EForceInit::ForceInit);
+
 	APawn* AiPawn{};
-	FVector forwardAi(EForceInit::ForceInit);
 	FVector aiLocation(EForceInit::ForceInit);
-	FVector NewDir(EForceInit::ForceInit);
+
 	FVector dest;
-	float searchEffect{};
+	FVector destA;
+	FVector destB;
 	FVector MoveVector(EForceInit::ForceInit);
-	bool hasPoint{};
 
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("Elite !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
 
@@ -55,17 +56,34 @@ void ACrowdAiController_Elite::SecondPhase()
 
 	if (::IsValid(PlayerPawn) && ::IsValid(AiPawn))
 	{
-		playerLocation = PlayerPawn->AActor::K2_GetActorLocation();
+		Super::isSafe = false;
+		Super::Shoot();
+		Super::isSafe = true;
+
 		forwardPlayer = PlayerPawn->AActor::GetActorForwardVector();
-		forwardAi = AiPawn->AActor::GetActorForwardVector();
+		playerLocation = PlayerPawn->AActor::K2_GetActorLocation();
+		
 		aiLocation = AiPawn->AActor::K2_GetActorLocation();
+	UKismetSystemLibrary::PrintString(this, FString(MoveVector.ToString()), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20);
+		MoveVector = forwardPlayer.RotateAngleAxis(90.0f, FVector(0,0,1));
+	UKismetSystemLibrary::PrintString(this, FString(MoveVector.ToString()), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20);
+		destA = aiLocation + MoveVector * -10;
+		destB = aiLocation + MoveVector * 10;
+		
+		if(FVector::Distance(destA, playerLocation) < FVector::Distance(destB, playerLocation))
+		{
+			dest = destB;
+		} 
+		else
+		{
+			dest = destA;
+		}
+		
+		UKismetSystemLibrary::PrintString(this, FString(dest.ToString()), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20);
 
-		NewDir = FVector::CrossProduct(aiLocation, forwardPlayer);
-		NewDir = UKismetMathLibrary::Normal(NewDir, 0.000100);
-		MoveVector = UKismetMathLibrary::Multiply_VectorFloat(NewDir, 2 * SearchRadius);
-		MoveVector = UKismetMathLibrary::Add_VectorVector(aiLocation, MoveVector);
-
-		Super::WalkTo(MoveVector);
+		Super::WalkTo(dest);
 	}
-
+	else {
+		Super::MoveSuccess();
+	}
 }

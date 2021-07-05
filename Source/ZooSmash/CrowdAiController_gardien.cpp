@@ -35,13 +35,14 @@
 #include "MyAICharacter.h"
 
 
-void ACrowdAiController_gardien::Tick(float DeltaSeconds) {
+void ACrowdAiController_gardien::Tick(float DeltaSeconds) 
+{
 	Super::Tick(DeltaSeconds);
-	ACharacter* characterAI = AController::GetCharacter();
-	(static_cast<AMyAICharacter*>(characterAI))->OnShoot();
-	/*if (!Super::IsFarOfPlayer()) {
+	//ACharacter* characterAI = AController::GetCharacter();
+	//(static_cast<AMyAICharacter*>(characterAI))->OnShoot();
+	if (!isSafe) {
 		LookAt();
-	}*/
+	}
 }
 
 void ACrowdAiController_gardien::SecondPhase()
@@ -54,35 +55,41 @@ void ACrowdAiController_gardien::SecondPhase()
 
 void ACrowdAiController_gardien::MoveSuccess()
 {
+	isSafe = Super::IsFarOfPlayer();
 	Super::MoveSuccess();
 }
 
 void ACrowdAiController_gardien::SecondPhaseFail(EPathFollowingResult::Type moveResult)
 {
-	Super::MoveSuccess();
+	ACrowdAiController_gardien::MoveSuccess();
 }
 
-void ACrowdAiController_gardien::Shoot() {
-
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("Shoot !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("Shoot !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+void ACrowdAiController_gardien::Shoot() 
+{
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("Shoot !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
 	ACharacter* characterAI = AController::GetCharacter();
 	(static_cast<AMyAICharacter*>(characterAI))->OnShoot();
 }
 
-void ACrowdAiController_gardien::LookAt() {
-
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("look")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20);
+void ACrowdAiController_gardien::LookAt() 
+{
 	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	APawn* AiPawn = AController::K2_GetPawn();
 	FVector playerLocation(EForceInit::ForceInit);
 	FVector aiLocation(EForceInit::ForceInit);
+	FRotator aiRotation;
 
 	if (::IsValid(PlayerPawn) && ::IsValid(AiPawn))
 	{
 		playerLocation = PlayerPawn->AActor::K2_GetActorLocation();
 		aiLocation = AiPawn->AActor::K2_GetActorLocation();
-		UKismetMathLibrary::FindLookAtRotation(playerLocation, aiLocation);
+		aiRotation = AiPawn->AActor::GetActorRotation();
+		FRotator rot = UKismetMathLibrary::FindLookAtRotation(playerLocation, aiLocation);
+		rot.Pitch = 0;
+		rot.Roll = 0;
+		rot.Yaw += 180; 
+		FHitResult hitResult;	
+		AiPawn->AActor::K2_AddActorWorldRotation((rot - aiRotation), false, hitResult, false);
+		
 	}
 }
