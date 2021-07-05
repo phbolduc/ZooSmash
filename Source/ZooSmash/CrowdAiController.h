@@ -48,7 +48,7 @@ class ZOOSMASH_API ACrowdAiController : public AAIController
 		UPROPERTY(BlueprintReadWrite, Category = "ACrowdAiController_old")
 			float defaultSpeed = 250.0f;
 		UPROPERTY(BlueprintReadWrite, Category = "ACrowdAiController_old")
-			float InitSearchRadius = 600.0f;
+			float InitSearchRadius = 300.0f;
 		float SearchRadius = 200.0f;
 		AActor* currentDest = nullptr;
 

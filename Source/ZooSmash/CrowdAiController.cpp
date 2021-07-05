@@ -142,30 +142,29 @@ void ACrowdAiController::WalkTo(FVector dest)
 
 void ACrowdAiController::WalkTo(FVector dest, float rayon, FName successFunc, FName failFunc)
 {
-
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("Walk to")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.00);
 	UAIAsyncTaskBlueprintProxy* moveProxy = UAIBlueprintHelperLibrary::CreateMoveToProxyObject(this, ((APawn*)nullptr), dest, ((AActor*)nullptr), rayon, false);
-
-	return; //KCST_EndOfThread
+	FTimerHandle _loopTimerHandle;
 
 	if (UKismetSystemLibrary::IsValid(moveProxy))
 	{
+		UKismetSystemLibrary::PrintString(this, FString(TEXT("moveProxy")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20.0);
+		/*
 		FString textToPrint = FString(TEXT("id : "));
 		textToPrint.AppendInt(moveProxy->MoveRequestId.GetID());
 		UKismetSystemLibrary::PrintString(this, textToPrint, true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
+		*/
 
 		TScriptDelegate<FWeakObjectPtr> callSuccess, callFail;
 		callSuccess.BindUFunction(this, successFunc);
 
 		callFail.BindUFunction(this, failFunc);
 
-		moveProxy->OnSuccess.AddUnique(callSuccess);
-		moveProxy->OnFail.AddUnique(callFail);
+		//moveProxy->OnSuccess.AddUnique(callSuccess);
+		//moveProxy->OnFail.AddUnique(callFail);
 		
 
 		// Ligne temporaire PATCH;
-		FTimerHandle _loopTimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle, this, &ACrowdAiController::MoveSuccess, 0.10f, false);
+		GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle, this, &ACrowdAiController::MoveSuccess, 0.5f, false);
 		
 		//moveProxy->OnSuccess.AddDynamic(this, &ACrowdAiController::MoveSuccess);
 		//moveProxy->OnFail.AddDynamic(this, &ACrowdAiController::FirstPhaseFail);
@@ -173,7 +172,7 @@ void ACrowdAiController::WalkTo(FVector dest, float rayon, FName successFunc, FN
 	}
 	else {
 		UKismetSystemLibrary::PrintString(this, FString(TEXT("Fail Walk to !!!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20.0);
-		MoveSuccess();
+		GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle, this, &ACrowdAiController::MoveSuccess, 0.5f, false);
 	}
 }
 
