@@ -46,6 +46,7 @@ class ZOOSMASH_API ACrowdAiController_gardien : public ACrowdAiController
 		
 		virtual void Tick(float DeltaSeconds) override;
 		virtual void MoveSuccess() override;
+		virtual void WalkTo(FVector dest) override;
 
 		virtual void SecondPhase() override;
 		virtual void SecondPhaseFail(EPathFollowingResult::Type moveResult) override;
@@ -53,6 +54,7 @@ class ZOOSMASH_API ACrowdAiController_gardien : public ACrowdAiController
 		virtual void Shoot();
 		virtual void LookAt();
 
+		
 		// Create Event
 		/*UFUNCTION(BlueprintImplementableEvent, Category = "crowd_man")
 			void OnShoot();*/

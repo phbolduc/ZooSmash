@@ -64,6 +64,11 @@ void ACrowdAiController_gardien::SecondPhaseFail(EPathFollowingResult::Type move
 	ACrowdAiController_gardien::MoveSuccess();
 }
 
+void ACrowdAiController_gardien::WalkTo(FVector dest)
+{
+	Super::WalkTo(dest);
+}
+
 void ACrowdAiController_gardien::Shoot() 
 {
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("Shoot !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);

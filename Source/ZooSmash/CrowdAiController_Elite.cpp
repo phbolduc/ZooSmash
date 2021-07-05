@@ -64,9 +64,9 @@ void ACrowdAiController_Elite::SecondPhase()
 		playerLocation = PlayerPawn->AActor::K2_GetActorLocation();
 		
 		aiLocation = AiPawn->AActor::K2_GetActorLocation();
-	UKismetSystemLibrary::PrintString(this, FString(MoveVector.ToString()), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20);
+		UKismetSystemLibrary::PrintString(this, FString(aiLocation.ToString()), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20);
+		
 		MoveVector = forwardPlayer.RotateAngleAxis(90.0f, FVector(0,0,1));
-	UKismetSystemLibrary::PrintString(this, FString(MoveVector.ToString()), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20);
 		destA = aiLocation + MoveVector * -10;
 		destB = aiLocation + MoveVector * 10;
 		
