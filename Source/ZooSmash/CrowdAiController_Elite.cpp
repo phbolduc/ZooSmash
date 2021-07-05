@@ -95,9 +95,9 @@ void ACrowdAiController_Elite::MoveAfterShoot()
 		ChangeSpeedCharacter(500.0f);
 		UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, MoveVector, dest, 1.000000, ((ANavigationData*)nullptr), ((UClass*)nullptr));
 		Super::WalkTo(dest);
-		//  X=1000.000 Y=5548.058 Z=41.818 à X=1000.000 Y=5783.094 Z=53.605
+		//  X=1000.000 Y=5548.058 Z=41.818 ï¿½ X=1000.000 Y=5783.094 Z=53.605
 
-		// X=1023.017 Y=4957.667 Z=90.050 à X=1030.714 Y=4951.282 Z=90.050
+		// X=1023.017 Y=4957.667 Z=90.050 ï¿½ X=1030.714 Y=4951.282 Z=90.050
 	}
 	else {
 		Super::MoveSuccess();
