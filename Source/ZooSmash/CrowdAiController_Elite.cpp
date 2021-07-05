@@ -67,21 +67,28 @@ void ACrowdAiController_Elite::SecondPhase()
 		UKismetSystemLibrary::PrintString(this, FString(aiLocation.ToString()), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20);
 		
 		MoveVector = forwardPlayer.RotateAngleAxis(90.0f, FVector(0,0,1));
-		destA = aiLocation + MoveVector * -10;
-		destB = aiLocation + MoveVector * 10;
+		MoveVector = UKismetMathLibrary::Normal(MoveVector, 0.000100);
+		MoveVector = UKismetMathLibrary::Multiply_VectorFloat(MoveVector, 2 * SearchRadius);
+		destA = aiLocation - MoveVector;
+		destB = aiLocation + MoveVector;
 		
 		if(FVector::Distance(destA, playerLocation) < FVector::Distance(destB, playerLocation))
 		{
-			dest = destB;
+			MoveVector = destB;
 		} 
 		else
 		{
-			dest = destA;
+			MoveVector = destA;
 		}
 		
-		UKismetSystemLibrary::PrintString(this, FString(dest.ToString()), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20);
+		UKismetSystemLibrary::PrintString(this, FString(MoveVector.ToString()), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20);
 
+		ChangeSpeedCharacter(500.0f);
+		UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, MoveVector, dest, 1.000000, ((ANavigationData*)nullptr), ((UClass*)nullptr));
 		Super::WalkTo(dest);
+		//  X=1000.000 Y=5548.058 Z=41.818 à X=1000.000 Y=5783.094 Z=53.605
+
+		// X=1023.017 Y=4957.667 Z=90.050 à X=1030.714 Y=4951.282 Z=90.050
 	}
 	else {
 		Super::MoveSuccess();

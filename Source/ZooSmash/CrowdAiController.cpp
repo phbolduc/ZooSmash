@@ -147,7 +147,10 @@ void ACrowdAiController::WalkTo(FVector dest, float rayon, FName successFunc, FN
 
 	if (UKismetSystemLibrary::IsValid(moveProxy))
 	{
-		UKismetSystemLibrary::PrintString(this, FString(TEXT("moveProxy")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20.0);
+		UKismetSystemLibrary::PrintString(this, FString(TEXT("moveProxy")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
+
+		UKismetSystemLibrary::PrintString(this, FString(dest.ToString()), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
+
 		/*
 		FString textToPrint = FString(TEXT("id : "));
 		textToPrint.AppendInt(moveProxy->MoveRequestId.GetID());
