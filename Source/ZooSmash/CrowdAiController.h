@@ -53,6 +53,7 @@ class ZOOSMASH_API ACrowdAiController : public AAIController
 		AActor* currentDest = nullptr;
 
 		virtual void BeginPlay() override;
+		virtual void Tick(float DeltaSeconds) override;
 
 		virtual void FirstPhase();
 		virtual void FirstPhaseFail(EPathFollowingResult::Type moveResult);

@@ -38,8 +38,6 @@
 void ACrowdAiController_gardien::Tick(float DeltaSeconds) 
 {
 	Super::Tick(DeltaSeconds);
-	//ACharacter* characterAI = AController::GetCharacter();
-	//(static_cast<AMyAICharacter*>(characterAI))->OnShoot();
 	if (!isSafe) {
 		LookAt();
 	}

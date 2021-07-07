@@ -40,6 +40,8 @@ class ANavigationData;
 template<class TClass>
 class TSubclassOf;
 
+bool mustReact = true;
+
 void ACrowdAiController::FirstPhase() {
 	APawn* listPawnAI{};
 	FVector actorForwardVector(EForceInit::ForceInit);
@@ -85,8 +87,9 @@ void ACrowdAiController::FirstPhase() {
 
 	if (!hasMultipleObjectInSphere)
 	{
-		SearchRadius = UKismetMathLibrary::Add_FloatFloat(SearchRadius, InitSearchRadius);
-		FirstPhase();
+		SearchRadius = UKismetMathLibrary::Add_FloatFloat(SearchRadius, InitSearchRadius); 
+		FTimerHandle _loopTimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle, this, &ACrowdAiController::MoveSuccess, 0.1f, false);
 	}
 	else {
 		SearchRadius = InitSearchRadius;
@@ -187,13 +190,7 @@ void ACrowdAiController::MoveSuccess(EPathFollowingResult::Type moveResult)
 void ACrowdAiController::MoveSuccess()
 {
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("MoveSuccess!!!!")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.00);
-	if (IsFarOfPlayer())
-	{
-		this->FirstPhase();
-	}
-	else {
-		this->SecondPhase();
-	}
+	mustReact = true;
 }
 
 void ACrowdAiController::FirstPhaseFail(EPathFollowingResult::Type moveResult)
@@ -271,4 +268,21 @@ void ACrowdAiController::BeginPlay()
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("Start")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
 	SearchRadius = InitSearchRadius;
 	MoveSuccess();
+}
+
+void ACrowdAiController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	if (mustReact) {
+		
+		mustReact = false;
+
+		if (IsFarOfPlayer())
+		{
+			this->FirstPhase();
+		}
+		else {
+			this->SecondPhase();
+		}
+	}
 }
