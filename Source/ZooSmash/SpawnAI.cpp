@@ -21,11 +21,11 @@ class ANavigationData;
 
 static float spawnRayon = 3000.0f;
 
-static int numberSpawnTourism = 1; //10;
-static int numberSpawnOld = 0;// 5;
-static int numberSpawnGardien = 0;// 4;
-static int numberSpawnElite = 0;// 1;
-static int numberSpawnRandomAi = 0;// 10;
+static int numberSpawnTourism = 5;
+static int numberSpawnOld = 2;
+static int numberSpawnGardien = 3;
+static int numberSpawnElite = 1;
+static int numberSpawnRandomAi = 9;
 
 static float probabilityTourism = 0.85f;
 static float probabilityOld = 0.8f;
