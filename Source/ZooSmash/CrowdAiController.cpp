@@ -40,8 +40,6 @@ class ANavigationData;
 template<class TClass>
 class TSubclassOf;
 
-bool mustReact = true;
-
 void ACrowdAiController::FirstPhase() {
 	APawn* listPawnAI{};
 	FVector actorForwardVector(EForceInit::ForceInit);
@@ -54,7 +52,6 @@ void ACrowdAiController::FirstPhase() {
 	bool hasMultipleObjectInSphere = false;
 	int32 len{};
 	int32 randomInt{};
-	int32 SubInt{};
 	bool hasGetPoint{};
 	TArray< FHitResult > sphereOutHit = TArray<FHitResult>();
 	
@@ -63,8 +60,8 @@ void ACrowdAiController::FirstPhase() {
 
 	ChangeSpeedCharacter(defaultSpeed);
 
-	listPawnAI = AController::K2_GetPawn();
-	if (::IsValid(listPawnAI) && ::IsValid(listPawnAI))
+	listPawnAI = GetPawn();
+	if (::IsValid(listPawnAI))
 	{
 		actorForwardVector = listPawnAI->AActor::GetActorForwardVector();
 		location = listPawnAI->AActor::K2_GetActorLocation();
@@ -105,7 +102,7 @@ void ACrowdAiController::FirstPhase() {
 		UPhysicalMaterial* physMat;
 		UPrimitiveComponent* hitComponent;
 
-		UGameplayStatics::BreakHitResult(sphereOutHit[SubInt], BlockingHit, bInitialOverlap, hitTime, hitDistance, hitLocation, impactPoint, hitNormal,
+		UGameplayStatics::BreakHitResult(sphereOutHit[randomInt], BlockingHit, bInitialOverlap, hitTime, hitDistance, hitLocation, impactPoint, hitNormal,
 			hitNormalImpact, physMat, hitActor, /*out*/ hitComponent, hitBoneName, hitItem, faceIndex, traceStart, traceEnd);
 		currentDest = hitActor;
 		hasGetPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, impactPoint, dest, 10.000000, ((ANavigationData*)nullptr), ((UClass*)nullptr));
@@ -128,7 +125,7 @@ void ACrowdAiController::SecondPhaseFail(EPathFollowingResult::Type moveResult) 
 
 void ACrowdAiController::ChangeSpeedCharacter(float maxSpeed)
 {
-    APawn* pawnList = AController::K2_GetPawn();
+    APawn* pawnList = GetPawn();
     AZooSmashCharacter* nodeCharacter = Cast<AZooSmashCharacter>(pawnList);
     bool hasPawn = (nodeCharacter != nullptr);
     if (hasPawn && UKismetSystemLibrary::IsValid(nodeCharacter) 
@@ -203,7 +200,7 @@ void ACrowdAiController::FirstPhaseFail(EPathFollowingResult::Type moveResult)
 	bool hasRandomPoint{};
 
 	playPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	aiPawn = AController::K2_GetPawn();
+	aiPawn = GetPawn();
 	if (!UKismetSystemLibrary::IsValid(playPawn) || !UKismetSystemLibrary::IsValid(aiPawn))
 	{
 		UKismetSystemLibrary::PrintString(this, FString(TEXT("Error componant")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
@@ -237,7 +234,7 @@ bool ACrowdAiController::IsFarOfPlayer()
 	bool hasRandomPoint{};
 
 	playPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	aiPawn = AController::K2_GetPawn();
+	aiPawn = GetPawn();
 
 	if (UKismetSystemLibrary::IsValid(playPawn) && UKismetSystemLibrary::IsValid(aiPawn))
 	{
@@ -273,8 +270,8 @@ void ACrowdAiController::BeginPlay()
 void ACrowdAiController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
 	if (mustReact) {
-		
 		mustReact = false;
 
 		if (IsFarOfPlayer())
@@ -285,4 +282,5 @@ void ACrowdAiController::Tick(float DeltaSeconds)
 			this->SecondPhase();
 		}
 	}
+
 }
