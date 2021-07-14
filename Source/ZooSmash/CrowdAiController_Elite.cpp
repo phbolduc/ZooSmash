@@ -64,7 +64,7 @@ void ACrowdAiController_Elite::MoveAfterShoot()
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("Elite !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
 
 	PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	AiPawn = AController::K2_GetPawn();
+	AiPawn = GetPawn();
 
 	if (::IsValid(PlayerPawn) && ::IsValid(AiPawn))
 	{
@@ -77,7 +77,7 @@ void ACrowdAiController_Elite::MoveAfterShoot()
 		
 		MoveVector = forwardPlayer.RotateAngleAxis(90.0f, FVector(0,0,1));
 		MoveVector = UKismetMathLibrary::Normal(MoveVector, 0.000100);
-		MoveVector = UKismetMathLibrary::Multiply_VectorFloat(MoveVector, 2 * SearchRadius);
+		MoveVector = UKismetMathLibrary::Multiply_VectorFloat(MoveVector, SearchRadius);
 		destA = aiLocation - MoveVector;
 		destB = aiLocation + MoveVector;
 		
