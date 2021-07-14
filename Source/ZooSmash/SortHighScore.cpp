@@ -19,9 +19,9 @@ bool  USortHighScore::KeyIsSmaller(TArray<FHighscore>& Array_score, int32 i, int
 		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("%u"), Array_score[j].score));
 	}
 	else if (keyIndex == 2) {
-		isSmaller = Array_score[i].time > Array_score[j].time;
-		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("%u"), Array_score[i].time));
-		// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("%u"), Array_score[j].time));
+		isSmaller = Array_score[i].time < Array_score[j].time;
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("%u"), Array_score[i].time));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("%u"), Array_score[j].time));
 	}
 	// GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("%d"), isSmaller));
 	return isSmaller;
