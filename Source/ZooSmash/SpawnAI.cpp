@@ -13,13 +13,10 @@
 #include "CoreMinimal.h"
 #include "GeneratedCodeHelpers.h"
 
-
 class UAIAsyncTaskBlueprintProxy;
-class UNavigationSystemV1;
-class UNavigationQueryFilter;
-class ANavigationData;
 
 static float spawnRayon = 3000.0f;
+static float spawnRayonMax = 15000.0f;
 
 static int numberSpawnTourism = 5;
 static int numberSpawnOld = 2;
@@ -32,7 +29,7 @@ static float probabilityOld = 0.8f;
 static float probabilityGardien = 0.5f;
 static float probabilityElite = 0.2f;
 
-static TSubclassOf<AMyAICharacter> spawnTourismActor;
+static TArray<TSubclassOf<AMyAICharacter>> spawnTourismActor = TArray<TSubclassOf<AMyAICharacter>>();
 static TSubclassOf<AMyAICharacter> spawnOldActor;
 static TSubclassOf<AMyAICharacter> spawnGardienActor;
 static TSubclassOf<AMyAICharacter> spawnEliteActor;
@@ -66,37 +63,56 @@ void  USpawnAI::SetNumberSpawnRandom(int _number) {
 	numberSpawnRandomAi = _number;
 }
 
-void USpawnAI::SetSpawnTourismActor(TSubclassOf<AMyAICharacter> _spawnTourismActor){
-	if (_spawnTourismActor == NULL) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White,"Null class");
-	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, _spawnTourismActor->StaticClass()->GetFName().ToString());
+void USpawnAI::SetSpawnTourismActor(TArray<TSubclassOf<AMyAICharacter>> _spawnTourismActor){
 	spawnTourismActor = _spawnTourismActor;
+}
+void USpawnAI::AddSpawnTourismActor(TSubclassOf<AMyAICharacter> _spawnTourismActor) {
+	if (_spawnTourismActor == NULL) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, "Null class");
+	}
+	else {
+		spawnTourismActor.Add(_spawnTourismActor);
+	}
+}
+void USpawnAI::RemoveSpawnTourismActor(TSubclassOf<AMyAICharacter> _spawnTourismActor) {
+	if (_spawnTourismActor == NULL) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, "Null class");
+	}
+	else {
+		spawnTourismActor.Remove(_spawnTourismActor);
+	}
 }
 void  USpawnAI::SetSpawnOldActor(TSubclassOf<AMyAICharacter> _spawnOldActor) {
 	if (_spawnOldActor == NULL) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, "Null class");
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, _spawnOldActor->StaticClass()->GetFName().ToString());
-	spawnOldActor = _spawnOldActor;
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, _spawnOldActor->StaticClass()->GetFName().ToString());
+		spawnOldActor = _spawnOldActor;
+	}
 }
 void  USpawnAI::SetSpawnGardienActor(TSubclassOf<AMyAICharacter> _spawnGardienActor) {
 	if (_spawnGardienActor == NULL) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, "Null class");
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, _spawnGardienActor->StaticClass()->GetFName().ToString());
-	spawnGardienActor = _spawnGardienActor;
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, _spawnGardienActor->StaticClass()->GetFName().ToString());
+		spawnGardienActor = _spawnGardienActor;
+	}
 }
 void  USpawnAI::SetSpawnEliteActor(TSubclassOf<AMyAICharacter> _spawnEliteActor) {
 	if (_spawnEliteActor == NULL) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, "Null class");
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, _spawnEliteActor->StaticClass()->GetFName().ToString());
-	spawnEliteActor = _spawnEliteActor;
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, _spawnEliteActor->StaticClass()->GetFName().ToString());
+		spawnEliteActor = _spawnEliteActor;
+	}
 }
 
 void  USpawnAI::SetSpawnRayon(float _rayon) {
 	spawnRayon = _rayon;
+	spawnRayonMax = _rayon * 5;
 }
 
 void USpawnAI::SpawnAll(UObject* WorldContextObject) {
@@ -118,7 +134,7 @@ void USpawnAI::SpawnAllRandom(UObject* WorldContextObject) {
 
 void USpawnAI::SpawnAllTourism(UObject* WorldContextObject) {
 	for (int i = 0; i < numberSpawnTourism; i++) {
-		SpawnGardien(WorldContextObject);
+		SpawnTourism(WorldContextObject);
 	}
 }
 
@@ -170,7 +186,11 @@ void USpawnAI::SpawnRandom(UObject* WorldContextObject) {
 }
 
 void USpawnAI::SpawnTourism(UObject* WorldContextObject) {
-	SpawnCharacter(WorldContextObject, spawnTourismActor);
+	int32 numSpawnTourismActor = spawnTourismActor.Num();
+	if (numSpawnTourismActor > 0) {
+		int randomTourismActor = FMath::RandRange(0, numSpawnTourismActor - 1);
+		SpawnCharacter(WorldContextObject, spawnTourismActor[randomTourismActor]);
+	}
 }
 
 void USpawnAI::SpawnOld(UObject* WorldContextObject) {
@@ -254,7 +274,12 @@ void USpawnAI::Respawn(UObject* WorldContextObject, AActor* ActorToRespawn) {
 	if (!hasMultipleObjectInSphere)
 	{
 		spawnRayon = spawnRayon + spawnRayon * 0.1f;
-		USpawnAI::Respawn(WorldContextObject, ActorToRespawn);
+		if (spawnRayon < spawnRayonMax) {
+			USpawnAI::Respawn(WorldContextObject, ActorToRespawn);
+		}
+		else {
+			UKismetSystemLibrary::PrintString(WorldContextObject, FString(TEXT("Cannot spawn")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+		}
 	}
 	else {
 		len = FCustomThunkTemplates::Array_Length(sphereOutHit);

@@ -53,7 +53,7 @@ void ACrowdAiController::FirstPhase() {
 	int32 len{};
 	int32 randomInt{};
 	bool hasGetPoint{};
-	TArray< FHitResult > sphereOutHit = TArray<FHitResult>();
+	TArray<AActor*> sphereOutHit = TArray<AActor*>();
 	
 
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("First phase")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20);
@@ -69,17 +69,13 @@ void ACrowdAiController::FirstPhase() {
 		calcVector = UKismetMathLibrary::Multiply_VectorFloat(actorForwardVector, 500.0f);
 		calcVector = UKismetMathLibrary::Add_VectorVector(location, calcVector);
 		hasPointInRadius = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, calcVector, randomLocation, 10.0, ((ANavigationData*)nullptr), ((UClass*)nullptr));
-
 		randomVector = UKismetMathLibrary::RandomUnitVector();
 		calcVector = UKismetMathLibrary::Multiply_VectorFloat(randomVector, 100.0f);
 		calcVector = UKismetMathLibrary::Add_VectorVector(randomLocation, calcVector);
 
 		TArray<TEnumAsByte<EObjectTypeQuery>> searchPoint = TArray<TEnumAsByte<EObjectTypeQuery>>({ EObjectTypeQuery::ObjectTypeQuery7 });
 		TArray<AActor*> ignorePoint = TArray<AActor*>({ currentDest });
-		(sphereOutHit).Reset();
-		hasMultipleObjectInSphere = UKismetSystemLibrary::SphereTraceMultiForObjects(this, randomLocation, calcVector, SearchRadius,
-			searchPoint, false, ignorePoint, EDrawDebugTrace::ForDuration, /*out*/ sphereOutHit, true,
-			FLinearColor(1.000000, 0.000000, 0.000000, 1.000000), FLinearColor(0.000000, 1.000000, 0.000000, 1.000000), 5.00);
+		hasMultipleObjectInSphere = UKismetSystemLibrary::SphereOverlapActors(this, location, SearchRadius, searchPoint, false, ignorePoint, /*out*/ sphereOutHit);
 	}
 
 	if (!hasMultipleObjectInSphere)
@@ -90,23 +86,11 @@ void ACrowdAiController::FirstPhase() {
 	}
 	else {
 		SearchRadius = InitSearchRadius;
+		currentDest = sphereOutHit[randomInt];
+
 		len = FCustomThunkTemplates::Array_Length(sphereOutHit);
 		randomInt = UKismetMathLibrary::RandomIntegerInRange(1, len) - 1;
-
-		bool BlockingHit, bInitialOverlap;
-		float hitTime, hitDistance;
-		FVector hitLocation, impactPoint, hitNormal, hitNormalImpact, traceStart, traceEnd;
-		FName hitBoneName;
-		int32 faceIndex, hitItem;
-		AActor* hitActor;
-		UPhysicalMaterial* physMat;
-		UPrimitiveComponent* hitComponent;
-
-		UGameplayStatics::BreakHitResult(sphereOutHit[randomInt], BlockingHit, bInitialOverlap, hitTime, hitDistance, hitLocation, impactPoint, hitNormal,
-			hitNormalImpact, physMat, hitActor, /*out*/ hitComponent, hitBoneName, hitItem, faceIndex, traceStart, traceEnd);
-		currentDest = hitActor;
-		hasGetPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, impactPoint, dest, 10.000000, ((ANavigationData*)nullptr), ((UClass*)nullptr));
-
+		dest = sphereOutHit[randomInt]->AActor::K2_GetActorLocation();
 		WalkTo(dest);
 	}
 }
@@ -273,8 +257,8 @@ void ACrowdAiController::Tick(float DeltaSeconds)
 
 	if (mustReact) {
 		mustReact = false;
-
-		if (IsFarOfPlayer())
+		isFirstPhase = IsFarOfPlayer();
+		if (isFirstPhase)
 		{
 			this->FirstPhase();
 		}

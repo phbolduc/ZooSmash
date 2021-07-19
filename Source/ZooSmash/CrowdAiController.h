@@ -43,7 +43,11 @@ UCLASS()
 class ZOOSMASH_API ACrowdAiController : public AAIController
 {
 	GENERATED_BODY()
-		
+	
+	public:
+		UPROPERTY(BlueprintReadWrite, Category = "Custom IA")
+			bool isFirstPhase = true;
+
 	protected:
 		UPROPERTY(BlueprintReadWrite, Category = "Custom IA")
 			float defaultSpeed = 250.0f;

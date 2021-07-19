@@ -21,7 +21,11 @@ class ZOOSMASH_API USpawnAI : public UBlueprintFunctionLibrary
 	public:
 
 		UFUNCTION(BlueprintCallable, Category = "Custom IA")
-			static void SetSpawnTourismActor(TSubclassOf<AMyAICharacter> _spawnTourismActor);
+			static void SetSpawnTourismActor(TArray<TSubclassOf<AMyAICharacter>> _spawnTourismActor);
+		UFUNCTION(BlueprintCallable, Category = "Custom IA")
+			static void AddSpawnTourismActor(TSubclassOf<AMyAICharacter> _spawnTourismActor);
+		UFUNCTION(BlueprintCallable, Category = "Custom IA")
+			static void  RemoveSpawnTourismActor(TSubclassOf<AMyAICharacter> _spawnOldActor);
 		UFUNCTION(BlueprintCallable, Category = "Custom IA")
 			static void SetSpawnOldActor(TSubclassOf<AMyAICharacter> _spawnOldActor);
 		UFUNCTION(BlueprintCallable, Category = "Custom IA")
