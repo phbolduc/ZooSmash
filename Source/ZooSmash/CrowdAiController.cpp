@@ -40,8 +40,6 @@ class ANavigationData;
 template<class TClass>
 class TSubclassOf;
 
-bool mustReact = true;
-
 void ACrowdAiController::FirstPhase() {
 	APawn* listPawnAI{};
 	FVector actorForwardVector(EForceInit::ForceInit);
@@ -54,17 +52,17 @@ void ACrowdAiController::FirstPhase() {
 	bool hasMultipleObjectInSphere = false;
 	int32 len{};
 	int32 randomInt{};
-	int32 SubInt{};
 	bool hasGetPoint{};
 	TArray< FHitResult > sphereOutHit = TArray<FHitResult>();
+	//TArray<AActor*> sphereOutHit = TArray<AActor*>();
 	
 
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("First phase")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20);
 
 	ChangeSpeedCharacter(defaultSpeed);
 
-	listPawnAI = AController::K2_GetPawn();
-	if (::IsValid(listPawnAI) && ::IsValid(listPawnAI))
+	listPawnAI = GetPawn();
+	if (::IsValid(listPawnAI))
 	{
 		actorForwardVector = listPawnAI->AActor::GetActorForwardVector();
 		location = listPawnAI->AActor::K2_GetActorLocation();
@@ -72,13 +70,13 @@ void ACrowdAiController::FirstPhase() {
 		calcVector = UKismetMathLibrary::Multiply_VectorFloat(actorForwardVector, 500.0f);
 		calcVector = UKismetMathLibrary::Add_VectorVector(location, calcVector);
 		hasPointInRadius = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, calcVector, randomLocation, 10.0, ((ANavigationData*)nullptr), ((UClass*)nullptr));
-
 		randomVector = UKismetMathLibrary::RandomUnitVector();
 		calcVector = UKismetMathLibrary::Multiply_VectorFloat(randomVector, 100.0f);
 		calcVector = UKismetMathLibrary::Add_VectorVector(randomLocation, calcVector);
 
 		TArray<TEnumAsByte<EObjectTypeQuery>> searchPoint = TArray<TEnumAsByte<EObjectTypeQuery>>({ EObjectTypeQuery::ObjectTypeQuery7 });
 		TArray<AActor*> ignorePoint = TArray<AActor*>({ currentDest });
+		//hasMultipleObjectInSphere = UKismetSystemLibrary::SphereOverlapActors(this, location, SearchRadius, searchPoint, false, ignorePoint, /*out*/ sphereOutHit);
 		(sphereOutHit).Reset();
 		hasMultipleObjectInSphere = UKismetSystemLibrary::SphereTraceMultiForObjects(this, randomLocation, calcVector, SearchRadius,
 			searchPoint, false, ignorePoint, EDrawDebugTrace::ForDuration, /*out*/ sphereOutHit, true,
@@ -93,9 +91,7 @@ void ACrowdAiController::FirstPhase() {
 	}
 	else {
 		SearchRadius = InitSearchRadius;
-		len = FCustomThunkTemplates::Array_Length(sphereOutHit);
-		randomInt = UKismetMathLibrary::RandomIntegerInRange(1, len) - 1;
-
+		// currentDest = sphereOutHit[randomInt];
 		bool BlockingHit, bInitialOverlap;
 		float hitTime, hitDistance;
 		FVector hitLocation, impactPoint, hitNormal, hitNormalImpact, traceStart, traceEnd;
@@ -105,11 +101,13 @@ void ACrowdAiController::FirstPhase() {
 		UPhysicalMaterial* physMat;
 		UPrimitiveComponent* hitComponent;
 
-		UGameplayStatics::BreakHitResult(sphereOutHit[SubInt], BlockingHit, bInitialOverlap, hitTime, hitDistance, hitLocation, impactPoint, hitNormal,
+		UGameplayStatics::BreakHitResult(sphereOutHit[randomInt], BlockingHit, bInitialOverlap, hitTime, hitDistance, hitLocation, impactPoint, hitNormal,
 			hitNormalImpact, physMat, hitActor, /*out*/ hitComponent, hitBoneName, hitItem, faceIndex, traceStart, traceEnd);
 		currentDest = hitActor;
 		hasGetPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, impactPoint, dest, 10.000000, ((ANavigationData*)nullptr), ((UClass*)nullptr));
-
+		/*len = FCustomThunkTemplates::Array_Length(sphereOutHit);
+		randomInt = UKismetMathLibrary::RandomIntegerInRange(1, len) - 1;
+		dest = sphereOutHit[randomInt]->AActor::K2_GetActorLocation();*/
 		WalkTo(dest);
 	}
 }
@@ -128,7 +126,7 @@ void ACrowdAiController::SecondPhaseFail(EPathFollowingResult::Type moveResult) 
 
 void ACrowdAiController::ChangeSpeedCharacter(float maxSpeed)
 {
-    APawn* pawnList = AController::K2_GetPawn();
+    APawn* pawnList = GetPawn();
     AZooSmashCharacter* nodeCharacter = Cast<AZooSmashCharacter>(pawnList);
     bool hasPawn = (nodeCharacter != nullptr);
     if (hasPawn && UKismetSystemLibrary::IsValid(nodeCharacter) 
@@ -203,7 +201,7 @@ void ACrowdAiController::FirstPhaseFail(EPathFollowingResult::Type moveResult)
 	bool hasRandomPoint{};
 
 	playPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	aiPawn = AController::K2_GetPawn();
+	aiPawn = GetPawn();
 	if (!UKismetSystemLibrary::IsValid(playPawn) || !UKismetSystemLibrary::IsValid(aiPawn))
 	{
 		UKismetSystemLibrary::PrintString(this, FString(TEXT("Error componant")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
@@ -237,7 +235,7 @@ bool ACrowdAiController::IsFarOfPlayer()
 	bool hasRandomPoint{};
 
 	playPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	aiPawn = AController::K2_GetPawn();
+	aiPawn = GetPawn();
 
 	if (UKismetSystemLibrary::IsValid(playPawn) && UKismetSystemLibrary::IsValid(aiPawn))
 	{
@@ -245,13 +243,13 @@ bool ACrowdAiController::IsFarOfPlayer()
 		aiLocation = aiPawn->AActor::K2_GetActorLocation();
 		distance = UKismetMathLibrary::Vector_Distance(aiLocation, playerLocation);
 		rayon = 4 * SearchRadius;
-		isSmaller = UKismetMathLibrary::Less_FloatFloat(rayon, distance);
+		isSmaller = UKismetMathLibrary::Less_FloatFloat(rayon/10, distance);
 
 		if (isSmaller) {
-			UKismetSystemLibrary::PrintString(this, FString(TEXT("isSmaller")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20.0);
+			UKismetSystemLibrary::PrintString(this, FString(TEXT("isSmaller")), true, true, FLinearColor(0.0, 0.66, 1.00, 1.0), 20.0);
 		} 
 		else {
-			UKismetSystemLibrary::PrintString(this, FString(TEXT("isBig")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20.0);
+			UKismetSystemLibrary::PrintString(this, FString(TEXT("isBig")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
 		}
 	}
 
@@ -273,11 +271,11 @@ void ACrowdAiController::BeginPlay()
 void ACrowdAiController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	if (mustReact) {
-		
-		mustReact = false;
 
-		if (IsFarOfPlayer())
+	if (mustReact) {
+		mustReact = false;
+		isFirstPhase = IsFarOfPlayer();
+		if (isFirstPhase)
 		{
 			this->FirstPhase();
 		}
@@ -285,4 +283,5 @@ void ACrowdAiController::Tick(float DeltaSeconds)
 			this->SecondPhase();
 		}
 	}
+
 }

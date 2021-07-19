@@ -35,12 +35,11 @@
 void ACrowdAiController_tourism::SecondPhase()
 {
 	APawn* PlayerPawn{};
-	FVector location(EForceInit::ForceInit);
+	FVector playerLocation(EForceInit::ForceInit);
 	APawn* AiPawn{};
 	FVector AiLocation(EForceInit::ForceInit);
 	FVector NewDir(EForceInit::ForceInit);
 	FVector dest;
-	float searchEffect{};
 	FVector MoveVector(EForceInit::ForceInit);
 	bool hasPoint{};
 
@@ -48,25 +47,27 @@ void ACrowdAiController_tourism::SecondPhase()
 
 	ChangeSpeedCharacter(500.0f);
 	PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	if (::IsValid(PlayerPawn))
-	{
-		location = PlayerPawn->AActor::K2_GetActorLocation();
-	}
+	AiPawn = GetPawn();
 
-	AiPawn = AController::K2_GetPawn();
-
-	if (::IsValid(AiPawn))
-	{
+	if (::IsValid(PlayerPawn) && ::IsValid(AiPawn))
+	{ 
+		playerLocation = PlayerPawn->AActor::K2_GetActorLocation();
 		AiLocation = AiPawn->AActor::K2_GetActorLocation();
+
+		NewDir = UKismetMathLibrary::Subtract_VectorVector(AiLocation, playerLocation);
+		NewDir = UKismetMathLibrary::Normal(NewDir, 0.000100);
+
+		MoveVector = UKismetMathLibrary::Multiply_VectorFloat(NewDir, 2 * SearchRadius);
+		MoveVector = UKismetMathLibrary::Add_VectorVector(AiLocation, MoveVector);
+		hasPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, MoveVector, dest, 1.000000, ((ANavigationData*)nullptr), ((UClass*)nullptr));
+		
+		dest.Z = AiLocation.Z;
+		Super::WalkTo(dest);
+	}
+	else {
+		Super::MoveSuccess();
 	}
 
-	NewDir = UKismetMathLibrary::Subtract_VectorVector(AiLocation, location);
-	NewDir = UKismetMathLibrary::Normal(NewDir, 0.000100);
-	MoveVector = UKismetMathLibrary::Multiply_VectorFloat(NewDir, 2 * SearchRadius);
-	MoveVector = UKismetMathLibrary::Add_VectorVector(AiLocation, MoveVector);
-	hasPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, MoveVector, dest, 1.000000, ((ANavigationData*)nullptr), ((UClass*)nullptr));
-
-	Super::WalkTo(dest);
 }
 
 void ACrowdAiController_tourism::SecondPhaseFail(EPathFollowingResult::Type moveResult)
@@ -76,13 +77,15 @@ void ACrowdAiController_tourism::SecondPhaseFail(EPathFollowingResult::Type move
 	FVector randomPoint;
 	bool hasRandomPoint{};
 	FVector reverseDir(EForceInit::ForceInit);
-	aiPawn = AController::K2_GetPawn();
+	aiPawn = GetPawn();
 	if (UKismetSystemLibrary::IsValid(aiPawn))
 	{
 		aiLocotion = aiPawn->AActor::K2_GetActorLocation();
+		hasRandomPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, aiLocotion, randomPoint, 100.0, ((ANavigationData*)nullptr), ((UClass*)nullptr));
+		reverseDir = randomPoint * -1;
+		Super::WalkTo(reverseDir, 5.0f, FName(TEXT("SecondPhase")), FName(TEXT("SecondPhase")));
 	}
-	hasRandomPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, aiLocotion, randomPoint, 100.0, ((ANavigationData*)nullptr), ((UClass*)nullptr));
-
-	reverseDir = randomPoint * -1;
-	Super::WalkTo(reverseDir, 5.0f, FName(TEXT("SecondPhase")), FName(TEXT("SecondPhase")));
+	else {
+		Super::MoveSuccess();
+	}
 }
