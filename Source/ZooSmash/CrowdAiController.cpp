@@ -53,7 +53,8 @@ void ACrowdAiController::FirstPhase() {
 	int32 len{};
 	int32 randomInt{};
 	bool hasGetPoint{};
-	TArray<AActor*> sphereOutHit = TArray<AActor*>();
+	TArray< FHitResult > sphereOutHit = TArray<FHitResult>();
+	//TArray<AActor*> sphereOutHit = TArray<AActor*>();
 	
 
 	UKismetSystemLibrary::PrintString(this, FString(TEXT("First phase")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20);
@@ -75,7 +76,11 @@ void ACrowdAiController::FirstPhase() {
 
 		TArray<TEnumAsByte<EObjectTypeQuery>> searchPoint = TArray<TEnumAsByte<EObjectTypeQuery>>({ EObjectTypeQuery::ObjectTypeQuery7 });
 		TArray<AActor*> ignorePoint = TArray<AActor*>({ currentDest });
-		hasMultipleObjectInSphere = UKismetSystemLibrary::SphereOverlapActors(this, location, SearchRadius, searchPoint, false, ignorePoint, /*out*/ sphereOutHit);
+		//hasMultipleObjectInSphere = UKismetSystemLibrary::SphereOverlapActors(this, location, SearchRadius, searchPoint, false, ignorePoint, /*out*/ sphereOutHit);
+		(sphereOutHit).Reset();
+		hasMultipleObjectInSphere = UKismetSystemLibrary::SphereTraceMultiForObjects(this, randomLocation, calcVector, SearchRadius,
+			searchPoint, false, ignorePoint, EDrawDebugTrace::ForDuration, /*out*/ sphereOutHit, true,
+			FLinearColor(1.000000, 0.000000, 0.000000, 1.000000), FLinearColor(0.000000, 1.000000, 0.000000, 1.000000), 5.00);
 	}
 
 	if (!hasMultipleObjectInSphere)
@@ -86,11 +91,23 @@ void ACrowdAiController::FirstPhase() {
 	}
 	else {
 		SearchRadius = InitSearchRadius;
-		currentDest = sphereOutHit[randomInt];
+		// currentDest = sphereOutHit[randomInt];
+		bool BlockingHit, bInitialOverlap;
+		float hitTime, hitDistance;
+		FVector hitLocation, impactPoint, hitNormal, hitNormalImpact, traceStart, traceEnd;
+		FName hitBoneName;
+		int32 faceIndex, hitItem;
+		AActor* hitActor;
+		UPhysicalMaterial* physMat;
+		UPrimitiveComponent* hitComponent;
 
-		len = FCustomThunkTemplates::Array_Length(sphereOutHit);
+		UGameplayStatics::BreakHitResult(sphereOutHit[randomInt], BlockingHit, bInitialOverlap, hitTime, hitDistance, hitLocation, impactPoint, hitNormal,
+			hitNormalImpact, physMat, hitActor, /*out*/ hitComponent, hitBoneName, hitItem, faceIndex, traceStart, traceEnd);
+		currentDest = hitActor;
+		hasGetPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, impactPoint, dest, 10.000000, ((ANavigationData*)nullptr), ((UClass*)nullptr));
+		/*len = FCustomThunkTemplates::Array_Length(sphereOutHit);
 		randomInt = UKismetMathLibrary::RandomIntegerInRange(1, len) - 1;
-		dest = sphereOutHit[randomInt]->AActor::K2_GetActorLocation();
+		dest = sphereOutHit[randomInt]->AActor::K2_GetActorLocation();*/
 		WalkTo(dest);
 	}
 }
@@ -226,13 +243,13 @@ bool ACrowdAiController::IsFarOfPlayer()
 		aiLocation = aiPawn->AActor::K2_GetActorLocation();
 		distance = UKismetMathLibrary::Vector_Distance(aiLocation, playerLocation);
 		rayon = 4 * SearchRadius;
-		isSmaller = UKismetMathLibrary::Less_FloatFloat(rayon, distance);
+		isSmaller = UKismetMathLibrary::Less_FloatFloat(rayon/10, distance);
 
 		if (isSmaller) {
-			UKismetSystemLibrary::PrintString(this, FString(TEXT("isSmaller")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20.0);
+			UKismetSystemLibrary::PrintString(this, FString(TEXT("isSmaller")), true, true, FLinearColor(0.0, 0.66, 1.00, 1.0), 20.0);
 		} 
 		else {
-			UKismetSystemLibrary::PrintString(this, FString(TEXT("isBig")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20.0);
+			UKismetSystemLibrary::PrintString(this, FString(TEXT("isBig")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
 		}
 	}
 

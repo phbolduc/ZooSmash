@@ -152,7 +152,7 @@ void USpawnAI::SpawnAllGardien(UObject* WorldContextObject) {
 
 void USpawnAI::SpawnAllElite(UObject* WorldContextObject) {
 	for (int i = 0; i < numberSpawnElite; i++) {
-		SpawnGardien(WorldContextObject);
+		SpawnElite(WorldContextObject);
 	}
 }
 
