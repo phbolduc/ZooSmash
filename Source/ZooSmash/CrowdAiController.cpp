@@ -189,12 +189,12 @@ void ACrowdAiController::FirstPhaseFail(EPathFollowingResult::Type moveResult)
 		UKismetSystemLibrary::Delay(this, 0.200000, FLatentActionInfo(2, -41540233, TEXT("MoveSuccess"), this));
 	}
 
-	playerLocation = playPawn->AActor::K2_GetActorLocation();
-	aiLocation = aiPawn->AActor::K2_GetActorLocation();
+	playerLocation = playPawn->AActor::GetActorLocation();
+	aiLocation = aiPawn->AActor::GetActorLocation();
 	
 	if (IsFarOfPlayer())
 	{
-		UKismetSystemLibrary::Delay(this, 0.200000, FLatentActionInfo(2, -41540233, TEXT("MoveSuccess"), this));
+		UKismetSystemLibrary::Delay(this, 0.2, FLatentActionInfo(2, -41540233, TEXT("MoveSuccess"), this));
 	} 
 	else 
 	{

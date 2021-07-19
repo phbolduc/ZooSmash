@@ -43,23 +43,21 @@ void ACrowdAiController_tourism::SecondPhase()
 	FVector MoveVector(EForceInit::ForceInit);
 	bool hasPoint{};
 
-	//UKismetSystemLibrary::PrintString(this, FString(TEXT("Fear !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
-
 	ChangeSpeedCharacter(500.0f);
 	PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	AiPawn = GetPawn();
 
 	if (::IsValid(PlayerPawn) && ::IsValid(AiPawn))
 	{ 
-		playerLocation = PlayerPawn->AActor::K2_GetActorLocation();
-		AiLocation = AiPawn->AActor::K2_GetActorLocation();
+		playerLocation = PlayerPawn->AActor::GetActorLocation();
+		AiLocation = AiPawn->AActor::GetActorLocation();
 
 		NewDir = UKismetMathLibrary::Subtract_VectorVector(AiLocation, playerLocation);
 		NewDir = UKismetMathLibrary::Normal(NewDir, 0.000100);
 
-		MoveVector = UKismetMathLibrary::Multiply_VectorFloat(NewDir, 2 * SearchRadius);
+		MoveVector = UKismetMathLibrary::Multiply_VectorFloat(NewDir, SearchRadius);
 		MoveVector = UKismetMathLibrary::Add_VectorVector(AiLocation, MoveVector);
-		hasPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, MoveVector, dest, 1.000000, ((ANavigationData*)nullptr), ((UClass*)nullptr));
+		hasPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, MoveVector, dest, 1.0, ((ANavigationData*)nullptr), ((UClass*)nullptr));
 		
 		dest.Z = AiLocation.Z;
 		Super::WalkTo(dest);
