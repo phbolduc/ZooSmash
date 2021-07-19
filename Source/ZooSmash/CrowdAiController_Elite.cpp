@@ -37,7 +37,7 @@
 
 void ACrowdAiController_Elite::SecondPhase()
 {
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("Elite !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+	// UKismetSystemLibrary::PrintString(this, FString(TEXT("Elite !!!")), true, true, FLinearColor(0, 0.66, 1.0, 1.0), 2.000000);
 	
 	FTimerHandle _loopTimerHandle;
 	
@@ -61,7 +61,7 @@ void ACrowdAiController_Elite::MoveAfterShoot()
 	FVector destB;
 	FVector MoveVector(EForceInit::ForceInit);
 
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("Elite !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+	//UKismetSystemLibrary::PrintString(this, FString(TEXT("Elite !!!")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 2.0);
 
 	PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	AiPawn = GetPawn();
@@ -73,7 +73,7 @@ void ACrowdAiController_Elite::MoveAfterShoot()
 		playerLocation = PlayerPawn->AActor::K2_GetActorLocation();
 		
 		aiLocation = AiPawn->AActor::K2_GetActorLocation();
-		UKismetSystemLibrary::PrintString(this, FString(aiLocation.ToString()), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20);
+		//UKismetSystemLibrary::PrintString(this, FString(aiLocation.ToString()), true, true, FLinearColor(0, 0.66, 1.0, 1.0), 20);
 		
 		MoveVector = forwardPlayer.RotateAngleAxis(90.0f, FVector(0,0,1));
 		MoveVector = UKismetMathLibrary::Normal(MoveVector, 0.000100);
@@ -90,7 +90,7 @@ void ACrowdAiController_Elite::MoveAfterShoot()
 			MoveVector = destA;
 		}
 		
-		UKismetSystemLibrary::PrintString(this, FString(MoveVector.ToString()), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20);
+		// UKismetSystemLibrary::PrintString(this, FString(MoveVector.ToString()), true, true, FLinearColor(0, 0.66, 1.0, 1.0), 20);
 
 		ChangeSpeedCharacter(500.0f);
 		UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, MoveVector, dest, 1.0, ((ANavigationData*)nullptr), ((UClass*)nullptr));

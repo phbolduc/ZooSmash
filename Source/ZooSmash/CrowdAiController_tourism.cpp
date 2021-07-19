@@ -43,7 +43,7 @@ void ACrowdAiController_tourism::SecondPhase()
 	FVector MoveVector(EForceInit::ForceInit);
 	bool hasPoint{};
 
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("Fear !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+	//UKismetSystemLibrary::PrintString(this, FString(TEXT("Fear !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
 
 	ChangeSpeedCharacter(500.0f);
 	PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);

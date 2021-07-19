@@ -71,7 +71,7 @@ void ACrowdAiController_gardien::Shoot()
 {
 	ACharacter* characterAI = AController::GetCharacter();
 	(static_cast<AMyAICharacter*>(characterAI))->OnShoot();
-	UKismetSystemLibrary::PrintString(this, FString(TEXT("Shoot !!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+	//UKismetSystemLibrary::PrintString(this, FString(TEXT("Shoot !!!")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 2.0);
 }
 
 void ACrowdAiController_gardien::LookAt() 

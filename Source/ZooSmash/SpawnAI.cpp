@@ -87,7 +87,7 @@ void  USpawnAI::SetSpawnOldActor(TSubclassOf<AMyAICharacter> _spawnOldActor) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, "Null class");
 	}
 	else {
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, _spawnOldActor->StaticClass()->GetFName().ToString());
+		// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, _spawnOldActor->StaticClass()->GetFName().ToString());
 		spawnOldActor = _spawnOldActor;
 	}
 }
@@ -96,7 +96,7 @@ void  USpawnAI::SetSpawnGardienActor(TSubclassOf<AMyAICharacter> _spawnGardienAc
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, "Null class");
 	}
 	else {
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, _spawnGardienActor->StaticClass()->GetFName().ToString());
+		// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, _spawnGardienActor->StaticClass()->GetFName().ToString());
 		spawnGardienActor = _spawnGardienActor;
 	}
 }
@@ -105,7 +105,7 @@ void  USpawnAI::SetSpawnEliteActor(TSubclassOf<AMyAICharacter> _spawnEliteActor)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, "Null class");
 	}
 	else {
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, _spawnEliteActor->StaticClass()->GetFName().ToString());
+		// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, _spawnEliteActor->StaticClass()->GetFName().ToString());
 		spawnEliteActor = _spawnEliteActor;
 	}
 }
@@ -278,7 +278,7 @@ void USpawnAI::Respawn(UObject* WorldContextObject, AActor* ActorToRespawn) {
 			USpawnAI::Respawn(WorldContextObject, ActorToRespawn);
 		}
 		else {
-			UKismetSystemLibrary::PrintString(WorldContextObject, FString(TEXT("Cannot spawn")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
+			UKismetSystemLibrary::PrintString(WorldContextObject, FString(TEXT("Cannot spawn")), true, true, FLinearColor(0, 0.66, 1.0, 1.0), 2.0);
 		}
 	}
 	else {
