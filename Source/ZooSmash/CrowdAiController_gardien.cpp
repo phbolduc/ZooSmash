@@ -38,9 +38,9 @@
 void ACrowdAiController_gardien::Tick(float DeltaSeconds) 
 {
 	Super::Tick(DeltaSeconds);
-	/*if (!isSafe) {
+	if (!isSafe) {
 		LookAt();
-	}*/
+	}
 }
 
 void ACrowdAiController_gardien::SecondPhase()
