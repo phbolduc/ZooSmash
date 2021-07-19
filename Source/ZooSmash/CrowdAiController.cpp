@@ -64,8 +64,8 @@ void ACrowdAiController::FirstPhase() {
 	listPawnAI = GetPawn();
 	if (::IsValid(listPawnAI))
 	{
-		actorForwardVector = listPawnAI->AActor::GetActorForwardVector();
-		location = listPawnAI->AActor::K2_GetActorLocation();
+		actorForwardVector = listPawnAI->GetActorForwardVector();
+		location = listPawnAI->GetActorLocation();
 
 		calcVector = UKismetMathLibrary::Multiply_VectorFloat(actorForwardVector, 500.0f);
 		calcVector = UKismetMathLibrary::Add_VectorVector(location, calcVector);
@@ -78,9 +78,10 @@ void ACrowdAiController::FirstPhase() {
 		TArray<AActor*> ignorePoint = TArray<AActor*>({ currentDest });
 		//hasMultipleObjectInSphere = UKismetSystemLibrary::SphereOverlapActors(this, location, SearchRadius, searchPoint, false, ignorePoint, /*out*/ sphereOutHit);
 		(sphereOutHit).Reset();
+
 		hasMultipleObjectInSphere = UKismetSystemLibrary::SphereTraceMultiForObjects(this, randomLocation, calcVector, SearchRadius,
 			searchPoint, false, ignorePoint, EDrawDebugTrace::ForDuration, /*out*/ sphereOutHit, true,
-			FLinearColor(1.000000, 0.000000, 0.000000, 1.000000), FLinearColor(0.000000, 1.000000, 0.000000, 1.000000), 5.00);
+			FLinearColor(1.0, 0.0, 0.0, 1.0), FLinearColor(0.0, 1.0, 0.0, 1.0), 5.00);
 	}
 
 	if (!hasMultipleObjectInSphere)
