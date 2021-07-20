@@ -37,14 +37,12 @@
 
 void ACrowdAiController_Elite::SecondPhase()
 {
-	// UKismetSystemLibrary::PrintString(this, FString(TEXT("Elite !!!")), true, true, FLinearColor(0, 0.66, 1.0, 1.0), 2.000000);
-	
 	FTimerHandle _loopTimerHandle;
-	
+
 	Super::LookAt();
 	Super::Shoot();
+
 	GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle, this, &ACrowdAiController_Elite::MoveAfterShoot, 0.1f, false);
-	
 }
 
 void ACrowdAiController_Elite::MoveAfterShoot()
@@ -69,11 +67,10 @@ void ACrowdAiController_Elite::MoveAfterShoot()
 	if (::IsValid(PlayerPawn) && ::IsValid(AiPawn))
 	{
 
-		forwardPlayer = PlayerPawn->AActor::GetActorForwardVector();
-		playerLocation = PlayerPawn->AActor::K2_GetActorLocation();
+		forwardPlayer = PlayerPawn->GetActorForwardVector();
+		playerLocation = PlayerPawn->GetActorLocation();
 		
-		aiLocation = AiPawn->AActor::K2_GetActorLocation();
-		//UKismetSystemLibrary::PrintString(this, FString(aiLocation.ToString()), true, true, FLinearColor(0, 0.66, 1.0, 1.0), 20);
+		aiLocation = AiPawn->GetActorLocation();
 		
 		MoveVector = forwardPlayer.RotateAngleAxis(90.0f, FVector(0,0,1));
 		MoveVector = UKismetMathLibrary::Normal(MoveVector, 0.000100);
@@ -89,10 +86,8 @@ void ACrowdAiController_Elite::MoveAfterShoot()
 		{
 			MoveVector = destA;
 		}
-		
-		// UKismetSystemLibrary::PrintString(this, FString(MoveVector.ToString()), true, true, FLinearColor(0, 0.66, 1.0, 1.0), 20);
 
-		ChangeSpeedCharacter(500.0f);
+		ChangeSpeedCharacter(400.0f);
 		UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, MoveVector, dest, 1.0, ((ANavigationData*)nullptr), ((UClass*)nullptr));
 		Super::WalkTo(dest);
 	}

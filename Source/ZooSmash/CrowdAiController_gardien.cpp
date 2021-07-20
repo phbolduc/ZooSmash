@@ -46,8 +46,8 @@ void ACrowdAiController_gardien::SecondPhase()
 {	
 	FTimerHandle _loopTimerHandle = FTimerHandle();
 	FTimerHandle _loopTimerHandle2 = FTimerHandle();
-	GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle, this, &ACrowdAiController_gardien::Shoot, 1.1f, false);
-	GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle2, this, &ACrowdAiController_gardien::MoveSuccess, 1.2f, false);
+	GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle, this, &ACrowdAiController_gardien::Shoot, 2.4f, false);
+	GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle2, this, &ACrowdAiController_gardien::MoveSuccess, 2.5f, false);
 }
 
 void ACrowdAiController_gardien::MoveSuccess()
@@ -69,7 +69,12 @@ void ACrowdAiController_gardien::WalkTo(FVector dest)
 void ACrowdAiController_gardien::Shoot() 
 {
 	ACharacter* characterAI = GetCharacter();
-	(static_cast<AMyAICharacter*>(characterAI))->OnShoot();
+	try {
+		(static_cast<AMyAICharacter*>(characterAI))->OnShoot();
+	}
+	catch (...) {
+		UKismetSystemLibrary::PrintString(this, FString(characterAI->GetName()), true, true, FLinearColor(0, 0.66, 1.0, 1.0), 20);
+	}
 }
 
 void ACrowdAiController_gardien::LookAt() 
