@@ -70,7 +70,10 @@ void ACrowdAiController_gardien::Shoot()
 {
 	ACharacter* characterAI = GetCharacter();
 	try {
-		(static_cast<AMyAICharacter*>(characterAI))->OnShoot();
+		AMyAICharacter* myCharacterAI = static_cast<AMyAICharacter*>(characterAI);
+		if (myCharacterAI != nullptr) {
+			myCharacterAI->OnShoot();
+		}
 	}
 	catch (...) {
 		UKismetSystemLibrary::PrintString(this, FString(characterAI->GetName()), true, true, FLinearColor(0, 0.66, 1.0, 1.0), 20);
