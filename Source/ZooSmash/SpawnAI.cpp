@@ -87,7 +87,6 @@ void  USpawnAI::SetSpawnOldActor(TSubclassOf<AMyAICharacter> _spawnOldActor) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, "Null class");
 	}
 	else {
-		// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, _spawnOldActor->StaticClass()->GetFName().ToString());
 		spawnOldActor = _spawnOldActor;
 	}
 }
@@ -96,7 +95,6 @@ void  USpawnAI::SetSpawnGardienActor(TSubclassOf<AMyAICharacter> _spawnGardienAc
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, "Null class");
 	}
 	else {
-		// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, _spawnGardienActor->StaticClass()->GetFName().ToString());
 		spawnGardienActor = _spawnGardienActor;
 	}
 }
@@ -105,7 +103,6 @@ void  USpawnAI::SetSpawnEliteActor(TSubclassOf<AMyAICharacter> _spawnEliteActor)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, "Null class");
 	}
 	else {
-		// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, _spawnEliteActor->StaticClass()->GetFName().ToString());
 		spawnEliteActor = _spawnEliteActor;
 	}
 }
@@ -220,7 +217,7 @@ void USpawnAI::SpawnCharacter(UObject* WorldContextObject, TSubclassOf<AMyAIChar
 		
 		if (UKismetSystemLibrary::IsValid(playPawn))
 		{
-			playerLocation = playPawn->AActor::K2_GetActorLocation();
+			playerLocation = playPawn->GetActorLocation();
 
 			TArray<TEnumAsByte<EObjectTypeQuery>> searchPoint = TArray<TEnumAsByte<EObjectTypeQuery>>({ EObjectTypeQuery::ObjectTypeQuery7 });
 			TArray<AActor*> ignorePoint = TArray<AActor*>({ });
@@ -232,12 +229,14 @@ void USpawnAI::SpawnCharacter(UObject* WorldContextObject, TSubclassOf<AMyAIChar
 		if (!hasMultipleObjectInSphere)
 		{
 			spawnRayon = spawnRayon + spawnRayon * 0.1f;
-			USpawnAI::SpawnCharacter(WorldContextObject, ActorToSpawn);
+			if (spawnRayon < spawnRayonMax) {
+				USpawnAI::SpawnCharacter(WorldContextObject, ActorToSpawn);
+			}
 		}
 		else {
 			len = FCustomThunkTemplates::Array_Length(sphereOutHit);
 			randomInt = UKismetMathLibrary::RandomIntegerInRange(1, len) - 1;
-			spawnLocation = sphereOutHit[randomInt]->AActor::K2_GetActorLocation();
+			spawnLocation = sphereOutHit[randomInt]->GetActorLocation();
 
 			FRotator rot;
 			UWorld* world = playPawn->GetWorld();

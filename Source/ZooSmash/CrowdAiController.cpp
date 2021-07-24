@@ -40,6 +40,7 @@ class ANavigationData;
 template<class TClass>
 class TSubclassOf;
 
+/*
 void ACrowdAiController::FirstPhase() {
 	APawn* listPawnAI{};
 	FVector actorForwardVector(EForceInit::ForceInit);
@@ -64,18 +65,29 @@ void ACrowdAiController::FirstPhase() {
 	if (::IsValid(listPawnAI))
 	{
 		actorForwardVector = listPawnAI->GetActorForwardVector();
-		location = listPawnAI->GetActorLocation();
+		randomInt = UKismetMathLibrary::RandomIntegerInRange(0, 3);
 
-		calcVector = UKismetMathLibrary::Multiply_VectorFloat(actorForwardVector, 500.0f);
-		calcVector = UKismetMathLibrary::Add_VectorVector(location, calcVector);
-		hasPointInRadius = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, calcVector, randomLocation, 10.0, ((ANavigationData*)nullptr), ((UClass*)nullptr));
-		randomVector = UKismetMathLibrary::RandomUnitVector();
-		calcVector = UKismetMathLibrary::Multiply_VectorFloat(randomVector, 100.0f);
-		calcVector = UKismetMathLibrary::Add_VectorVector(randomLocation, calcVector);
+		if (randomInt <= 1) {
+			calcVector = actorForwardVector;// UKismetMathLibrary::Multiply_VectorFloat(actorForwardVector, 1.1f);
+		}
+		else {
+			location = listPawnAI->GetActorLocation();
+			calcVector = actorForwardVector.RotateAngleAxis(90.0f, FVector(0, 0, 1));
+			calcVector = UKismetMathLibrary::Normal(calcVector, 0.0100);
+
+			if (randomInt == 2)
+			{
+				calcVector = location + calcVector;
+			}
+			else
+			{
+				calcVector = location - calcVector;
+			}
+		}
 
 		TArray<TEnumAsByte<EObjectTypeQuery>> searchPoint = TArray<TEnumAsByte<EObjectTypeQuery>>({ EObjectTypeQuery::ObjectTypeQuery7 });
 		TArray<AActor*> ignorePoint = TArray<AActor*>({ currentDest });
-		hasMultipleObjectInSphere = UKismetSystemLibrary::SphereOverlapActors(this, location, SearchRadius, searchPoint, false, ignorePoint, /*out*/ sphereOutHit);
+		hasMultipleObjectInSphere = UKismetSystemLibrary::SphereOverlapActors(this, calcVector, SearchRadius/4, searchPoint, false, ignorePoint, sphereOutHit);
 	}
 
 	if (!hasMultipleObjectInSphere)
@@ -86,11 +98,99 @@ void ACrowdAiController::FirstPhase() {
 	}
 	else {
 		SearchRadius = InitSearchRadius;
-		currentDest = sphereOutHit[randomInt];
-		
 		len = FCustomThunkTemplates::Array_Length(sphereOutHit);
 		randomInt = UKismetMathLibrary::RandomIntegerInRange(1, len) - 1;
-		dest = sphereOutHit[randomInt]->AActor::K2_GetActorLocation();
+		currentDest = sphereOutHit[randomInt];
+
+		dest = sphereOutHit[randomInt]->GetActorLocation();
+		randomVector = UKismetMathLibrary::RandomUnitVector();
+		calcVector = UKismetMathLibrary::Multiply_VectorFloat(randomVector, 100.0f);
+		dest = UKismetMathLibrary::Add_VectorVector(dest, calcVector);
+
+		WalkTo(dest);
+	}
+}
+*/
+
+void ACrowdAiController::FirstPhase() {
+	APawn* listPawnAI{};
+	FVector actorForwardVector(EForceInit::ForceInit);
+	FVector location(EForceInit::ForceInit);
+	FVector calcVector(EForceInit::ForceInit);
+	FVector dest(EForceInit::ForceInit);
+	bool hasPointInRadius{};
+	FVector randomVector(EForceInit::ForceInit);
+	FVector randomLocation(EForceInit::ForceInit);
+	bool hasMultipleObjectInSphere = false;
+	int32 len{};
+	int32 randomInt{};
+	bool hasGetPoint{};
+	TArray< FHitResult > sphereOutHit = TArray<FHitResult>();
+
+	ChangeSpeedCharacter(defaultSpeed);
+
+	listPawnAI = GetPawn();
+	if (::IsValid(listPawnAI) && ::IsValid(listPawnAI))
+	{
+		randomInt = UKismetMathLibrary::RandomIntegerInRange(0, 3);
+		actorForwardVector = listPawnAI->GetActorForwardVector();
+		location = listPawnAI->GetActorLocation();
+
+		if (randomInt > 1){
+			actorForwardVector = (actorForwardVector - location).RotateAngleAxis(90.0f, FVector(0, 0, 1));
+			actorForwardVector = (randomInt == 2) ? location + actorForwardVector : location - actorForwardVector;
+		}
+
+		calcVector = UKismetMathLibrary::Multiply_VectorFloat(actorForwardVector, 500.0f);
+		calcVector = UKismetMathLibrary::Add_VectorVector(location, calcVector);
+		hasPointInRadius = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, calcVector, randomLocation, 10.0, ((ANavigationData*)nullptr), ((UClass*)nullptr));
+
+		randomVector = UKismetMathLibrary::RandomUnitVector();
+		calcVector = UKismetMathLibrary::Multiply_VectorFloat(randomVector, 100.0f);
+		calcVector = UKismetMathLibrary::Add_VectorVector(randomLocation, calcVector);
+
+		TArray<TEnumAsByte<EObjectTypeQuery>> searchPoint = TArray<TEnumAsByte<EObjectTypeQuery>>({ EObjectTypeQuery::ObjectTypeQuery7 });
+		TArray<AActor*> ignorePoint = TArray<AActor*>({ currentDest });
+		(sphereOutHit).Reset();
+		hasMultipleObjectInSphere = UKismetSystemLibrary::SphereTraceMultiForObjects(this, randomLocation, calcVector, SearchRadius,
+			searchPoint, false, ignorePoint, EDrawDebugTrace::None, /*out*/ sphereOutHit, true,
+			FLinearColor(0.0, 0.0, 0.0, 0.0), FLinearColor(0.0, 0.0, 0.0, 0.0), 0.0);
+	}
+
+	if (!hasMultipleObjectInSphere)
+	{
+		SearchRadius = UKismetMathLibrary::Add_FloatFloat(SearchRadius, InitSearchRadius);
+		if (SearchRadius <= InitSearchRadius * 4) {
+			FirstPhase();
+		}
+		else
+		{
+			SearchRadius = InitSearchRadius;
+			MoveSuccess();
+		}
+	}
+	else {
+		SearchRadius = InitSearchRadius;
+		len = FCustomThunkTemplates::Array_Length(sphereOutHit);
+		randomInt = UKismetMathLibrary::RandomIntegerInRange(1, len) - 1;
+
+		bool BlockingHit, bInitialOverlap;
+		float hitTime, hitDistance;
+		FVector hitLocation, impactPoint, hitNormal, hitNormalImpact, traceStart, traceEnd;
+		FName hitBoneName;
+		int32 faceIndex, hitItem;
+		AActor* hitActor;
+		UPhysicalMaterial* physMat;
+		UPrimitiveComponent* hitComponent;
+
+		// Get the hitActor
+		UGameplayStatics::BreakHitResult(sphereOutHit[randomInt], BlockingHit, bInitialOverlap, hitTime, hitDistance, hitLocation, impactPoint, hitNormal,
+			hitNormalImpact, physMat, hitActor, /*out*/ hitComponent, hitBoneName, hitItem, faceIndex, traceStart, traceEnd);
+		currentDest = hitActor;
+
+		// Get a position around the hit actor
+		hasGetPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, impactPoint, dest, 10.000000, ((ANavigationData*)nullptr), ((UClass*)nullptr));
+
 		WalkTo(dest);
 	}
 }
@@ -128,37 +228,23 @@ void ACrowdAiController::WalkTo(FVector dest, float rayon, FName successFunc, FN
 {
 	UAIAsyncTaskBlueprintProxy* moveProxy = UAIBlueprintHelperLibrary::CreateMoveToProxyObject(this, ((APawn*)nullptr), dest, ((AActor*)nullptr), rayon, false);
 	FTimerHandle _loopTimerHandle;
-
+	GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle, this, &ACrowdAiController::MoveSuccess, 0.5f, false);
+	/*	
 	if (UKismetSystemLibrary::IsValid(moveProxy))
 	{
-		/*
-		UKismetSystemLibrary::PrintString(this, FString(TEXT("moveProxy")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
-		UKismetSystemLibrary::PrintString(this, FString(dest.ToString()), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
-		FString textToPrint = FString(TEXT("id : "));
-		textToPrint.AppendInt(moveProxy->MoveRequestId.GetID());
-		UKismetSystemLibrary::PrintString(this, textToPrint, true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
-		*/
-
 		TScriptDelegate<FWeakObjectPtr> callSuccess, callFail;
 		callSuccess.BindUFunction(this, successFunc);
-
 		callFail.BindUFunction(this, failFunc);
 
-		//moveProxy->OnSuccess.AddUnique(callSuccess);
-		//moveProxy->OnFail.AddUnique(callFail);
-		
-
-		// Ligne temporaire PATCH;
-		GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle, this, &ACrowdAiController::MoveSuccess, 0.5f, false);
-		
-		//moveProxy->OnSuccess.AddDynamic(this, &ACrowdAiController::MoveSuccess);
-		//moveProxy->OnFail.AddDynamic(this, &ACrowdAiController::FirstPhaseFail);
-		//MoveSuccess();
+		moveProxy->OnSuccess.AddUnique(callSuccess);
+		moveProxy->OnFail.AddUnique(callFail);
+		moveProxy->OnSuccess.AddDynamic(this, &ACrowdAiController::MoveSuccess);
+		moveProxy->OnFail.AddDynamic(this, &ACrowdAiController::FirstPhaseFail);
 	}
 	else {
-		// UKismetSystemLibrary::PrintString(this, FString(TEXT("Fail Walk to !!!!")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 20.0);
-		GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle, this, &ACrowdAiController::MoveSuccess, 0.5f, false);
+		// Fail methode...
 	}
+	*/
 }
 
 void ACrowdAiController::MoveSuccess(EPathFollowingResult::Type moveResult)
@@ -168,7 +254,6 @@ void ACrowdAiController::MoveSuccess(EPathFollowingResult::Type moveResult)
 
 void ACrowdAiController::MoveSuccess()
 {
-	// UKismetSystemLibrary::PrintString(this, FString(TEXT("MoveSuccess!!!!")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.00);
 	mustReact = true;
 }
 
@@ -210,28 +295,19 @@ bool ACrowdAiController::IsFarOfPlayer()
 	APawn* aiPawn{};
 	FVector playerLocation(EForceInit::ForceInit);
 	FVector aiLocation(EForceInit::ForceInit);
-	float distance{};
-	float rayon{};
 	bool isSmaller = true;
 	bool hasRandomPoint{};
+	float distance{};
 
 	playPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	aiPawn = GetPawn();
 
 	if (UKismetSystemLibrary::IsValid(playPawn) && UKismetSystemLibrary::IsValid(aiPawn))
 	{
-		playerLocation = playPawn->AActor::K2_GetActorLocation();
-		aiLocation = aiPawn->AActor::K2_GetActorLocation();
+		playerLocation = playPawn->GetActorLocation();
+		aiLocation = aiPawn->GetActorLocation();
 		distance = UKismetMathLibrary::Vector_Distance(aiLocation, playerLocation);
-		rayon = 4 * SearchRadius;
-		isSmaller = UKismetMathLibrary::Less_FloatFloat(rayon/4, distance);
-
-		/*if (isSmaller) {
-			UKismetSystemLibrary::PrintString(this, FString(TEXT("isSmaller")), true, true, FLinearColor(0.0, 0.66, 1.00, 1.0), 20.0);
-		} 
-		else {
-			UKismetSystemLibrary::PrintString(this, FString(TEXT("isBig")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20.0);
-		}*/
+		isSmaller = UKismetMathLibrary::Less_FloatFloat(InitSearchRadius * 3, distance);
 	}
 
 	return isSmaller;
