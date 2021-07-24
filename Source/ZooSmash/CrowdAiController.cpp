@@ -137,7 +137,7 @@ void ACrowdAiController::FirstPhase() {
 		location = listPawnAI->GetActorLocation();
 
 		if (randomInt > 1){
-			actorForwardVector = (actorForwardVector - location).RotateAngleAxis(90.0f, FVector(0, 0, 1));
+			actorForwardVector = actorForwardVector.RotateAngleAxis(90.0f, FVector(0, 0, 1));
 			actorForwardVector = (randomInt == 2) ? location + actorForwardVector : location - actorForwardVector;
 		}
 
