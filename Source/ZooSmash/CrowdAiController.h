@@ -47,6 +47,8 @@ class ZOOSMASH_API ACrowdAiController : public AAIController
 	public:
 		UPROPERTY(BlueprintReadWrite, Category = "Custom IA")
 			bool isFirstPhase = true;
+		UPROPERTY(BlueprintReadWrite, Category = "Custom IA")
+			bool canSwitchPhase = false;
 
 	protected:
 		UPROPERTY(BlueprintReadWrite, Category = "Custom IA")

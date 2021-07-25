@@ -229,22 +229,6 @@ void ACrowdAiController::WalkTo(FVector dest, float rayon, FName successFunc, FN
 	UAIAsyncTaskBlueprintProxy* moveProxy = UAIBlueprintHelperLibrary::CreateMoveToProxyObject(this, ((APawn*)nullptr), dest, ((AActor*)nullptr), rayon, false);
 	FTimerHandle _loopTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle, this, &ACrowdAiController::MoveSuccess, 0.5f, false);
-	/*	
-	if (UKismetSystemLibrary::IsValid(moveProxy))
-	{
-		TScriptDelegate<FWeakObjectPtr> callSuccess, callFail;
-		callSuccess.BindUFunction(this, successFunc);
-		callFail.BindUFunction(this, failFunc);
-
-		moveProxy->OnSuccess.AddUnique(callSuccess);
-		moveProxy->OnFail.AddUnique(callFail);
-		moveProxy->OnSuccess.AddDynamic(this, &ACrowdAiController::MoveSuccess);
-		moveProxy->OnFail.AddDynamic(this, &ACrowdAiController::FirstPhaseFail);
-	}
-	else {
-		// Fail methode...
-	}
-	*/
 }
 
 void ACrowdAiController::MoveSuccess(EPathFollowingResult::Type moveResult)
@@ -310,7 +294,7 @@ bool ACrowdAiController::IsFarOfPlayer()
 		isSmaller = UKismetMathLibrary::Less_FloatFloat(InitSearchRadius * 3, distance);
 	}
 
-	return isSmaller;
+	return  !canSwitchPhase || isSmaller;
 }
 
 /**
