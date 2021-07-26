@@ -56,16 +56,6 @@ void ACrowdAiController_gardien::MoveSuccess()
 	Super::MoveSuccess();
 }
 
-void ACrowdAiController_gardien::SecondPhaseFail(EPathFollowingResult::Type moveResult)
-{
-	ACrowdAiController_gardien::MoveSuccess();
-}
-
-void ACrowdAiController_gardien::WalkTo(FVector dest)
-{
-	Super::WalkTo(dest);
-}
-
 void ACrowdAiController_gardien::Shoot() 
 {
 	ACharacter* characterAI = GetCharacter();

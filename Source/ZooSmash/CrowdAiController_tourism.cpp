@@ -45,24 +45,3 @@ void ACrowdAiController_tourism::SecondPhase()
 	}
 
 }
-
-void ACrowdAiController_tourism::SecondPhaseFail(EPathFollowingResult::Type moveResult)
-{
-	APawn* aiPawn{};
-	FVector aiLocotion(EForceInit::ForceInit);
-	FVector reverseDir(EForceInit::ForceInit);
-	aiPawn = GetPawn();
-	FVector randomPoint;
-	bool hasRandomPoint{};
-
-	if (UKismetSystemLibrary::IsValid(aiPawn))
-	{
-		aiLocotion = aiPawn->GetActorLocation();
-		hasRandomPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, aiLocotion, randomPoint, 100.0, ((ANavigationData*)nullptr), ((UClass*)nullptr));
-		reverseDir = randomPoint * -1;
-		WalkTo(reverseDir, 5.0f, FName(TEXT("SecondPhase")), FName(TEXT("SecondPhase")));
-	}
-	else {
-		MoveSuccess();
-	}
-}

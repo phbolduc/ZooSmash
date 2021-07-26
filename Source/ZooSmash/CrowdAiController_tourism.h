@@ -6,9 +6,6 @@
 #include "CrowdAiController.h"
 #include "CrowdAiController_tourism.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class ZOOSMASH_API ACrowdAiController_tourism: public ACrowdAiController
 {
@@ -16,5 +13,4 @@ class ZOOSMASH_API ACrowdAiController_tourism: public ACrowdAiController
 
 	protected:
 		virtual void SecondPhase() override;
-		virtual void SecondPhaseFail(EPathFollowingResult::Type moveResult) override;
 };

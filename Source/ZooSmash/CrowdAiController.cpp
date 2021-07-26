@@ -40,78 +40,6 @@ class ANavigationData;
 template<class TClass>
 class TSubclassOf;
 
-/*
-void ACrowdAiController::FirstPhase() {
-	APawn* listPawnAI{};
-	FVector actorForwardVector(EForceInit::ForceInit);
-	FVector location(EForceInit::ForceInit);
-	FVector calcVector(EForceInit::ForceInit);
-	FVector dest(EForceInit::ForceInit);
-	bool hasPointInRadius{};
-	FVector randomVector(EForceInit::ForceInit);
-	FVector randomLocation(EForceInit::ForceInit);
-	bool hasMultipleObjectInSphere = false;
-	int32 len{};
-	int32 randomInt{};
-	bool hasGetPoint{};
-	TArray<AActor*> sphereOutHit = TArray<AActor*>();
-	
-
-	// UKismetSystemLibrary::PrintString(this, FString(TEXT("First phase")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20);
-
-	ChangeSpeedCharacter(defaultSpeed);
-
-	listPawnAI = GetPawn();
-	if (::IsValid(listPawnAI))
-	{
-		actorForwardVector = listPawnAI->GetActorForwardVector();
-		randomInt = UKismetMathLibrary::RandomIntegerInRange(0, 3);
-
-		if (randomInt <= 1) {
-			calcVector = actorForwardVector;// UKismetMathLibrary::Multiply_VectorFloat(actorForwardVector, 1.1f);
-		}
-		else {
-			location = listPawnAI->GetActorLocation();
-			calcVector = actorForwardVector.RotateAngleAxis(90.0f, FVector(0, 0, 1));
-			calcVector = UKismetMathLibrary::Normal(calcVector, 0.0100);
-
-			if (randomInt == 2)
-			{
-				calcVector = location + calcVector;
-			}
-			else
-			{
-				calcVector = location - calcVector;
-			}
-		}
-
-		TArray<TEnumAsByte<EObjectTypeQuery>> searchPoint = TArray<TEnumAsByte<EObjectTypeQuery>>({ EObjectTypeQuery::ObjectTypeQuery7 });
-		TArray<AActor*> ignorePoint = TArray<AActor*>({ currentDest });
-		hasMultipleObjectInSphere = UKismetSystemLibrary::SphereOverlapActors(this, calcVector, SearchRadius/4, searchPoint, false, ignorePoint, sphereOutHit);
-	}
-
-	if (!hasMultipleObjectInSphere)
-	{
-		SearchRadius = UKismetMathLibrary::Add_FloatFloat(SearchRadius, InitSearchRadius); 
-		FTimerHandle _loopTimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle, this, &ACrowdAiController::MoveSuccess, 0.1f, false);
-	}
-	else {
-		SearchRadius = InitSearchRadius;
-		len = FCustomThunkTemplates::Array_Length(sphereOutHit);
-		randomInt = UKismetMathLibrary::RandomIntegerInRange(1, len) - 1;
-		currentDest = sphereOutHit[randomInt];
-
-		dest = sphereOutHit[randomInt]->GetActorLocation();
-		randomVector = UKismetMathLibrary::RandomUnitVector();
-		calcVector = UKismetMathLibrary::Multiply_VectorFloat(randomVector, 100.0f);
-		dest = UKismetMathLibrary::Add_VectorVector(dest, calcVector);
-
-		WalkTo(dest);
-	}
-}
-*/
-
 void ACrowdAiController::FirstPhase() {
 	APawn* listPawnAI{};
 	FVector actorForwardVector(EForceInit::ForceInit);
@@ -195,16 +123,9 @@ void ACrowdAiController::FirstPhase() {
 	}
 }
 
-void ACrowdAiController::SecondPhase() {
-
-	// UKismetSystemLibrary::PrintString(this, FString(TEXT("Second phase")), true, true, FLinearColor(0.0, 0.66, 1.0, 1.0), 20);
-    ACrowdAiController::FirstPhase();
-}
-
-void ACrowdAiController::SecondPhaseFail(EPathFollowingResult::Type moveResult) {
-
-	// UKismetSystemLibrary::PrintString(this, FString(TEXT("Fail 2 phase")), true, true, FLinearColor(0.0, 0.66, 1.00, 1.00), 20.0);
-    ACrowdAiController::FirstPhaseFail(moveResult);
+void ACrowdAiController::SecondPhase()
+{
+	ACrowdAiController::FirstPhase();
 }
 
 void ACrowdAiController::ChangeSpeedCharacter(float maxSpeed)
@@ -221,19 +142,13 @@ void ACrowdAiController::ChangeSpeedCharacter(float maxSpeed)
 
 void ACrowdAiController::WalkTo(FVector dest)
 {
-	WalkTo(dest, InitSearchRadius, FName(TEXT("MoveSuccess")), FName(TEXT("FirstPhaseFail")));
+	WalkTo(dest, InitSearchRadius, 5.0f);
 }
-
-void ACrowdAiController::WalkTo(FVector dest, float rayon, FName successFunc, FName failFunc)
+void ACrowdAiController::WalkTo(FVector dest, float rayon, float timeToWait)
 {
 	UAIAsyncTaskBlueprintProxy* moveProxy = UAIBlueprintHelperLibrary::CreateMoveToProxyObject(this, ((APawn*)nullptr), dest, ((AActor*)nullptr), rayon, false);
 	FTimerHandle _loopTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle, this, &ACrowdAiController::MoveSuccess, 0.5f, false);
-}
-
-void ACrowdAiController::MoveSuccess(EPathFollowingResult::Type moveResult)
-{
-	MoveSuccess();
+	GetWorld()->GetTimerManager().SetTimer(_loopTimerHandle, this, &ACrowdAiController::MoveSuccess, timeToWait, false);
 }
 
 void ACrowdAiController::MoveSuccess()
@@ -241,37 +156,6 @@ void ACrowdAiController::MoveSuccess()
 	mustReact = true;
 }
 
-void ACrowdAiController::FirstPhaseFail(EPathFollowingResult::Type moveResult)
-{
-	APawn* playPawn{};
-	APawn* aiPawn{};
-	FVector playerLocation(EForceInit::ForceInit);
-	FVector aiLocation(EForceInit::ForceInit);
-	FVector randomLocation;
-	bool hasRandomPoint{};
-
-	playPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	aiPawn = GetPawn();
-	if (!UKismetSystemLibrary::IsValid(playPawn) || !UKismetSystemLibrary::IsValid(aiPawn))
-	{
-		// UKismetSystemLibrary::PrintString(this, FString(TEXT("Error componant")), true, true, FLinearColor(0.000000, 0.660000, 1.000000, 1.000000), 2.000000);
-		UKismetSystemLibrary::Delay(this, 0.200000, FLatentActionInfo(2, -41540233, TEXT("MoveSuccess"), this));
-	}
-
-	playerLocation = playPawn->AActor::GetActorLocation();
-	aiLocation = aiPawn->AActor::GetActorLocation();
-	
-	if (IsFarOfPlayer())
-	{
-		UKismetSystemLibrary::Delay(this, 0.2, FLatentActionInfo(2, -41540233, TEXT("MoveSuccess"), this));
-	} 
-	else 
-	{
-		hasRandomPoint = UNavigationSystemV1::K2_GetRandomReachablePointInRadius(this, aiLocation, randomLocation, 100.0, ((ANavigationData*)nullptr), ((UClass*)nullptr));
-		WalkTo(randomLocation, 5.0f, FName(TEXT("SecondPhase")), FName(TEXT("SecondPhaseFail")));
-	}
-
-}
 
 bool ACrowdAiController::IsFarOfPlayer()
 {
