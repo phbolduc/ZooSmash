@@ -142,7 +142,7 @@ void ACrowdAiController::ChangeSpeedCharacter(float maxSpeed)
 
 void ACrowdAiController::WalkTo(FVector dest)
 {
-	WalkTo(dest, InitSearchRadius, 5.0f);
+	WalkTo(dest, InitSearchRadius, 0.5f);
 }
 void ACrowdAiController::WalkTo(FVector dest, float rayon, float timeToWait)
 {
